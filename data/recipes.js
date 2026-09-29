@@ -1,0 +1,28 @@
+// Feature recipes: whole features built from patterns.
+// `uses` lists pattern ids; `spec` becomes the bullet list in the prompt.
+Whatsit.recipes = [
+  {id:'settings',name:'Settings page',say:'Where people change their account preferences.',uses:['tabs','toggle','radio','toast'],
+   spec:['Tabs across the top for “Profile”, “Notifications” and “Appearance”','Toggle switches in Notifications for email, push and weekly digest','A radio group in Appearance for Light / Dark / System theme','A toast saying “Settings saved” after each change']},
+  {id:'checkout',name:'Checkout',say:'Turning a cart into a paid order.',uses:['stepper','radio','checkbox','modal'],
+   spec:['A stepper with Cart → Address → Payment → Review','A radio group for shipping speed with prices','A checkbox to agree to the terms before paying','A modal confirming the order was placed, with the order number']},
+  {id:'product',name:'Product page',say:'One product with photos, options and reviews.',uses:['breadcrumb','carousel','segmented','tabs','badge'],
+   spec:['Breadcrumbs at the top (Home › Category › Product)','A carousel of product photos with dots and thumbnails','A segmented control to pick size','Tabs for Description / Reviews / Shipping','A cart icon with a notification badge showing the item count']},
+  {id:'filters',name:'Search with filters',say:'Narrowing a big list down to what someone wants.',uses:['drawer','chips','range','checkbox','skeleton'],
+   spec:['A “Filters” button that opens a drawer on mobile (sidebar on desktop)','Checkboxes for categories and a range slider for max price','Active filters shown as chips with × to remove, plus “Clear all”','Skeleton cards while results load']},
+  {id:'help',name:'Help center',say:'Answers people can find without contacting you.',uses:['breadcrumb','accordion','tooltip','toast'],
+   spec:['Breadcrumbs for Help › Topic','An accordion of questions grouped by topic, one open at a time','A tooltip on the “copy link” icon beside each question','A toast saying “Link copied” when a question link is copied']},
+  {id:'login',name:'Login & sign up',say:'Getting people into their account.',uses:['tabs','input','checkbox','otp','toast'],
+   spec:['Tabs to switch between “Log in” and “Sign up”','Text inputs with floating labels for email and password, with inline validation and a show/hide password button','A “Remember me” checkbox','A 6-digit code input for two-factor sign-in','A toast saying “Welcome back” after logging in']},
+  {id:'landing',name:'Landing page',say:'A one-page pitch that turns visitors into sign-ups.',uses:['navbar','hero','marquee','card','pricing','accordion'],
+   spec:['A sticky navigation bar with the logo, links and a “Get started” button','A hero section with a headline, subheadline and two buttons','A logo marquee of customer logos','Three feature cards','A pricing table with a Monthly / Yearly toggle','An FAQ accordion']},
+  {id:'dashboard',name:'Dashboard',say:'An overview screen people check every day.',uses:['navbar','drawer','card','table','progress','avatar'],
+   spec:['A top navigation bar, with a drawer menu on mobile','Four stat cards, each with a number and a trend','A sortable data table of recent orders','A progress bar for the monthly goal','An avatar group showing the team']},
+  {id:'chat',name:'Chat',say:'Messages between people, in real time.',uses:['avatar','input','badge','skeleton','empty'],
+   spec:['A conversation list with avatars and unread notification badges','Message bubbles, mine on the right and theirs on the left','A text input with a send button that also sends on Enter','Skeleton loaders while messages load','An empty state when there are no conversations yet']},
+  {id:'onboarding',name:'Onboarding flow',say:'The first few screens after someone signs up.',uses:['stepper','dropzone','radio','progress','toast'],
+   spec:['A stepper: Profile → Preferences → Done','A file dropzone for a profile photo','A radio group asking what they’ll use the app for','A progress bar showing how complete the profile is','A toast saying “You’re all set” at the end']},
+  {id:'booking',name:'Booking form',say:'Reserving a time, a table or a room.',uses:['datepicker','number','segmented','modal'],
+   spec:['A date picker with past dates disabled','A number input for the number of guests (1–10)','A segmented control for Morning / Afternoon / Evening','A modal confirming the booking with a summary']},
+  {id:'notifications',name:'Notification center',say:'Where people catch up on what happened.',uses:['badge','popover','tabs','timeline','empty'],
+   spec:['A bell icon with a notification badge','A popover that opens from the bell','Tabs for “All” and “Unread”','A timeline of notifications with timestamps','An empty state saying “You’re all caught up”']},
+];

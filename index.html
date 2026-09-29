@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Whatsit Library</title>
+<meta name="description" content="A visual dictionary of UI patterns for vibe coders: describe what you saw, learn what it's called, and copy a prompt that builds it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=DM+Sans:wght@400;700&family=Manrope:wght@400;700&family=Outfit:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Fraunces:wght@400;700&family=Lora:wght@400;700&family=DM+Serif+Display&family=Bebas+Neue&family=Syne:wght@400;700&family=Caveat:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Italiana&family=Poiret+One&family=Josefin+Sans:wght@300;700&family=Bodoni+Moda:wght@400;700&family=Bagel+Fat+One&family=Shrikhand&family=Titan+One&family=Michroma&family=Syncopate:wght@400;700&family=Anton&family=Big+Shoulders+Display:wght@800&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><h1 class="logo"><span>Whatsit</span></h1><span class="tag">UI words for vibe coders</span></div>
+    <p class="lede">You know what it looks like. Find out what it's called, save what you want, and copy one prompt that builds it all.</p>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" autocomplete="off" placeholder="Describe it… “pictures that slide sideways”" aria-label="Describe the thing you saw">
+    </div>
+    <div class="tries" id="tries"><small>Try:</small></div>
+    <div class="answer" id="answer" aria-live="polite"></div>
+  </header>
+
+  <div class="bar">
+    <div class="views" role="tablist" aria-label="Library">
+      <button role="tab" data-v="patterns" aria-selected="true">UI patterns</button>
+      <button role="tab" data-v="features" aria-selected="false">Feature recipes</button>
+      <button role="tab" data-v="fonts" aria-selected="false">Fonts</button>
+      <button role="tab" data-v="design" aria-selected="false">Design system</button>
+    </div>
+    <div class="pills" id="cats"></div>
+  </div>
+
+  <main>
+    <section id="view-patterns"><div id="grid" class="grid"></div></section>
+
+    <section id="view-features" hidden>
+      <p class="intro">Features are built from patterns. Once you know the words, you can ask for a whole feature at once and name every part of it.</p>
+      <div class="feats" id="featList"></div>
+    </section>
+
+    <section id="view-fonts" hidden>
+      <p class="intro">Pick one font for headings and one for body text. Your picks go into your design system and your cart.</p>
+      <div class="fsub" id="fsub"></div>
+      <div id="fonts-text">
+        <dl class="gloss" id="gloss"></dl>
+        <div class="tester">
+          <input type="text" id="ftext" value="Build something people love" aria-label="Preview text">
+          <label>Size <input type="range" id="fsize" min="18" max="64" value="32"></label>
+          <div class="pills" id="fcats"></div>
+        </div>
+        <div class="fgrid" id="fontList"></div>
+      </div>
+      <div id="fonts-display" hidden>
+        <p class="lic">Display fonts are for logos and big titles only. <b>Every font here is free for commercial use</b> (SIL Open Font License, from Google Fonts). Saw a paid font on social media? Search its name to buy a license. Whatsit can't host paid fonts.</p>
+        <div class="tester">
+          <input type="text" id="dtext" value="Aurora" maxlength="18" aria-label="Your app or brand name">
+          <div class="pills" id="dmoods"></div>
+        </div>
+        <div class="dgrid" id="displayList"></div>
+      </div>
+    </section>
+
+    <section id="view-design" hidden>
+      <p class="intro">Pick a starting palette, then adjust any color. The preview on the right updates as you go.</p>
+      <div class="ds">
+        <div class="ds-ctl" id="dsCtl"></div>
+        <div class="ds-side">
+          <div class="pv" id="pv">
+            <div class="pv-nav"><span class="pv-logo">Plantly</span><nav class="pv-links"><a class="on">Home</a><a>Shop</a><a>Care guides</a></nav></div>
+            <div class="pv-body">
+              <div><h1>Keep every plant alive</h1><p class="m" style="margin-top:6px">Watering reminders and care tips for 400+ houseplants.</p></div>
+              <div class="pv-btns"><button class="pv-btn">Start free trial</button><button class="pv-btn s">See how it works</button></div>
+              <div class="pv-card">
+                <div class="pv-row" style="justify-content:space-between"><h2>Monstera</h2><span class="pv-tag new">New</span></div>
+                <div class="pv-row"><span class="pv-tag ok">Watered</span><span class="pv-tag warn">Needs light</span><span class="pv-tag bad">Overdue</span></div>
+                <label class="pv-in">Plant nickname<input value="Big Monty"></label>
+                <div class="pv-sw">Watering reminders<span class="t"></span></div>
+              </div>
+              <div class="pv-alert">Your fiddle leaf fig hasn't been watered in 12 days.</div>
+            </div>
+          </div>
+          <div><h3 class="eyebrow" style="margin:0 0 8px">Readability check</h3><div class="checks" id="checks"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:28px;max-width:760px"><h3 class="eyebrow" style="margin:0 0 8px">Your design system prompt</h3><div id="dsOut"></div></div>
+    </section>
+  </main>
+</div>
+
+<button class="fab" id="fab" aria-label="Open cart"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/></svg><span class="lbl">Cart</span><span class="n" id="fabN">0</span></button>
+<div class="gtoast" id="gtoast" role="status" aria-live="polite"></div>
+
+<aside class="sheet-wrap" id="panel" hidden><div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="p-title" id="sheet"></div></aside>
+<aside class="sheet-wrap" id="cartWrap" hidden><div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="c-title" id="cartSheet"></div></aside>
+
+<script src="data/registry.js"></script>
+<script src="data/patterns/index.js"></script>
+<script src="data/recipes.js"></script>
+<script src="data/fonts.js"></script>
+<script src="data/palettes.js"></script>
+<script src="js/boot.js"></script>
+</body>
+</html>
