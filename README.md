@@ -3,6 +3,8 @@
 **You know what it looks like. Whatsit tells you what it's called, and gives you
 a prompt that builds it.**
 
+**Try it: [whatsit-library.vercel.app](https://whatsit-library.vercel.app)**
+
 Whatsit is a visual dictionary of UI patterns for vibe coders: people who build
 apps with AI tools like Cursor, Claude Code, Lovable or Bolt. Getting a good
 result from an AI depends on naming things precisely ("a carousel with dot
@@ -68,8 +70,9 @@ Adding a pattern means creating **one file**. See [CONTRIBUTING.md](CONTRIBUTING
 
 ## Deploy
 
-Any static host works. On GitHub Pages: **Settings → Pages → Deploy from a
-branch → `main` / root**.
+The live site is on Vercel and redeploys automatically on every push to `main`.
+Any static host works: on Vercel choose the **Other** preset with no build
+command; on GitHub Pages use **Settings → Pages → Deploy from a branch → `main` / root**.
 
 ## License
 
