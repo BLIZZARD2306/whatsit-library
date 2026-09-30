@@ -25,4 +25,10 @@ Whatsit.recipes = [
    spec:['A date picker with past dates disabled','A number input for the number of guests (1–10)','A segmented control for Morning / Afternoon / Evening','A modal confirming the booking with a summary']},
   {id:'notifications',name:'Notification center',say:'Where people catch up on what happened.',uses:['badge','popover','tabs','timeline','empty'],
    spec:['A bell icon with a notification badge','A popover that opens from the bell','Tabs for “All” and “Unread”','A timeline of notifications with timestamps','An empty state saying “You’re all caught up”']},
+  {id:'admin',name:'Admin panel',say:'Where your team manages users, orders and settings.',uses:['sidebar','search','stat','table','contextmenu','pagination'],
+   spec:['A collapsible sidebar navigation with Dashboard, Users, Orders and Settings','A search bar at the top that filters the current table','Four stat cards with values, change badges and sparklines','A sortable data table of users with pagination','A context menu on each row with Edit, Suspend and Delete']},
+  {id:'board',name:'Project board',say:'Tracking tasks as they move from to-do to done.',uses:['kanban','avatar','chips','modal','ring'],
+   spec:['A kanban board with To do, Doing and Done columns and drag and drop','Cards showing the assignee’s avatar and label chips','A modal with the full task details when a card is clicked','A progress ring showing how much of the sprint is done']},
+  {id:'security',name:'Security settings',say:'Where people protect their account.',uses:['password','toggle','otp','alert','toast'],
+   spec:['A password field with show/hide, a strength meter and a rules checklist for changing the password','A toggle switch to turn on two-factor sign-in','A code input to confirm two-factor setup','An alert banner while the account has no two-factor sign-in','A toast confirming each saved change']},
 ];

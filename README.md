@@ -13,7 +13,7 @@ fills that gap.
 
 ## What's inside
 
-- **40 UI patterns with live demos**: carousel, modal, toast, stepper, command
+- **52 UI patterns with live demos**: carousel, modal, toast, stepper, command
   palette, date picker, code input and more. Each one has:
   - the names people also use for it ("Modal = Dialog, Popup, Lightbox")
   - its parts, so you can describe it precisely (backdrop, dialog, actions…)
@@ -22,11 +22,11 @@ fills that gap.
   - a prompt builder: tick the options you want and copy the prompt
 - **Search in plain words**: type "box pops up and the page goes dark" and it
   answers *Modal*.
-- **12 feature recipes**: Checkout, Login & sign up, Dashboard, Landing page…
+- **15 feature recipes**: Checkout, Login & sign up, Dashboard, Admin panel, Landing page…
   Each shows which patterns it's built from.
 - **Fonts**: 15 everyday fonts and 14 display fonts, all free for commercial
   use (Google Fonts, SIL Open Font License), with mood filters and a font glossary.
-- **Design system builder**: palettes, colors explained in plain words,
+- **Design system builder**: 12 palettes, colors explained in plain words,
   typography, corners, shadows, a live preview and a readability check.
 - **Cart**: save patterns, recipes, fonts and your design system, then copy
   everything as **one combined prompt**.
