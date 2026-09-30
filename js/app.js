@@ -50,7 +50,8 @@ const onColor=h=>ratio(h,'#FFFFFF')>=ratio(h,'#111111')?'#FFFFFF':'#111111';
 /* ================= cart ================= */
 let cart=store.get('whatsit-cart',[]);
 const inCart=k=>cart.some(i=>i.k===k);
-function putCart(item,msg){const i=cart.findIndex(x=>x.k===item.k);if(i>=0)cart[i]=item;else cart.push(item);store.set('whatsit-cart',cart);refreshCart();toast(msg);}
+function putCart(item,msg){const i=cart.findIndex(x=>x.k===item.k);if(i>=0)cart[i]=item;else cart.push(item);store.set('whatsit-cart',cart);refreshCart();toast(msg);
+  const f=document.getElementById('fab');f.classList.remove('bump');void f.offsetWidth;f.classList.add('bump');}
 function dropCart(k,msg){cart=cart.filter(x=>x.k!==k);store.set('whatsit-cart',cart);refreshCart();if(msg)toast(msg);}
 function itemLabel(it){
   if(it.type==='pattern')return[byId[it.id].name,'UI pattern'];
@@ -132,9 +133,13 @@ function outBox(id,getText,extra=[]){
   const upd=()=>{ta.value=getText();};upd();
   return {el:w,ta,upd};
 }
-function saveBtn(key,onAdd,label='+ Save'){
-  const b=document.createElement('button');b.className='save';b.dataset.key=key;
-  const sync=()=>{const on=inCart(key);b.setAttribute('aria-pressed',on);b.textContent=on?'✓ Saved':label;};
+const BOOKMARK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>';
+function saveBtn(key,onAdd,label='+ Save',icon=false){
+  const b=document.createElement('button');b.className=icon?'bm':'save';b.dataset.key=key;
+  if(icon)b.innerHTML=BOOKMARK;
+  const sync=()=>{const on=inCart(key);b.setAttribute('aria-pressed',on);
+    if(icon){const t=on?'Saved to cart (click to remove)':'Save to cart';b.setAttribute('aria-label',t);b.title=t;}
+    else b.textContent=on?'✓ Saved':label;};
   b.onclick=e=>{e.stopPropagation();if(inCart(key))dropCart(key,'Removed from cart');else onAdd();sync();};
   b._sync=sync;sync();return b;
 }
@@ -161,28 +166,89 @@ function score(p,q){
 const grid=document.getElementById('grid'),answer=document.getElementById('answer'),q=document.getElementById('q');
 let cat='All';
 const mountDemo=(p,host)=>{host.innerHTML=p.html(++uid);if(p.init)p.init(host);};
+// Category order and one-line descriptions for the grouped library view.
+const CATS=[['Forms','Ways people type, pick and choose.'],['Navigation','How people move around an app.'],['Overlays','Things that float above the page.'],
+  ['Feedback','How the app talks back.'],['Layout','How content is arranged.'],['Data','Ways to show records, people and history.'],['Media','Pictures and motion.']]
+  .filter(([c])=>P.some(p=>p.cat===c));
+const catSlug=c=>'cat-'+c;
+function patternCard(p,i){
+  const c=document.createElement('article');c.className='card '+catSlug(p.cat);
+  c.innerHTML=`<div class="demo"></div><button class="meta" aria-label="${esc(p.name)}: see its parts and get the prompt"><span class="top"><span class="k">${p.cat}</span><span class="no">№${String(i+1).padStart(2,'0')}</span></span><span class="nm">${p.name}<span class="arr" aria-hidden="true">→</span></span><span class="aka">also called ${p.aka.join(', ')}</span><p class="say">${p.say}</p></button>`;
+  c.prepend(saveBtn('pattern:'+p.id,()=>putCart({k:'pattern:'+p.id,type:'pattern',id:p.id,picked:defaultPicked(p)},`Added ${p.name} to cart`),'+ Save',true));
+  mountDemo(p,c.querySelector('.demo'));
+  c.querySelector('.meta').onclick=e=>openPanel(p.id,e.currentTarget);
+  return c;
+}
 function renderGrid(){
   const query=q.value.trim();
   let list=P.map((p,i)=>({p,i,s:query?score(p,query):1})).filter(x=>x.s>0&&(cat==='All'||x.p.cat===cat));
   if(query)list.sort((a,b)=>b.s-a.s);
   grid.innerHTML='';
+  document.getElementById('pcount').textContent=query||cat!=='All'?`${list.length} of ${P.length}`:P.length;
   if(!list.length)grid.innerHTML=`<p class="empty">Nothing matched “${esc(query)}”. Describe what it does or where it appears, like “menu that slides in”.</p>`;
-  list.forEach(({p,i})=>{
-    const c=document.createElement('article');c.className='card';
-    c.innerHTML=`<div class="demo"></div><button class="meta" aria-label="Learn about ${p.name}"><span class="row"><span class="nm">${p.name}</span><span class="no">№${String(i+1).padStart(2,'0')}</span></span><span class="aka">also called ${p.aka.join(', ')}</span><p class="say">${p.say}</p><span class="more">Learn the words and get the prompt →</span></button>`;
-    c.prepend(saveBtn('pattern:'+p.id,()=>putCart({k:'pattern:'+p.id,type:'pattern',id:p.id,picked:defaultPicked(p)},`Added ${p.name} to cart`)));
-    mountDemo(p,c.querySelector('.demo'));
-    c.querySelector('.meta').onclick=e=>openPanel(p.id,e.currentTarget);
-    grid.appendChild(c);
-  });
-  if(query&&list.length){const top=list[0].p;answer.innerHTML=`That sounds like a <b>${top.name}</b>. <button>See what it's made of</button>`;answer.querySelector('button').onclick=e=>openPanel(top.id,e.currentTarget);}
+  if(!query&&cat==='All'){
+    // Browsing everything: group by category so the library has structure, not one flat wall.
+    CATS.forEach(([c,desc])=>{
+      const items=list.filter(x=>x.p.cat===c);if(!items.length)return;
+      const h=document.createElement('div');h.className='ghead '+catSlug(c);
+      h.innerHTML=`<h3>${c}</h3><p>${desc}</p><span class="c">${items.length} patterns</span>`;
+      grid.appendChild(h);
+      items.forEach(({p,i})=>grid.appendChild(patternCard(p,i)));
+    });
+  } else list.forEach(({p,i})=>grid.appendChild(patternCard(p,i)));
+  if(query&&list.length){
+    const top=list[0].p;
+    answer.innerHTML=`<span class="lead">That sounds like a</span><b>${top.name}</b><span class="aka">also called ${top.aka.slice(0,2).join(', ')}</span><button class="go">See its parts →</button>`;
+    answer.querySelector('.go').onclick=e=>openPanel(top.id,e.currentTarget);
+  } else if(query) answer.innerHTML='<span class="none">No match yet. Try describing where it appears or what it does.</span>';
   else answer.textContent='';
 }
 const catsEl=document.getElementById('cats');
-pills(catsEl,['All',...new Set(P.map(p=>p.cat))],cat,c=>{cat=c;renderGrid();});
-['pictures that slide sideways','pick only one answer','box pops up and the page goes dark','message that disappears by itself','click a question to show the answer','grey boxes while loading','menu slides in from the side','little red number on the bell','numbers at the bottom to change page','stars to rate something','boxes for a verification code','big headline at the top of the page']
+function renderCats(){
+  catsEl.innerHTML='';
+  [['All',P.length],...CATS.map(([c])=>[c,P.filter(p=>p.cat===c).length])].forEach(([c,n])=>{
+    const b=document.createElement('button');b.className=c==='All'?'':catSlug(c);b.setAttribute('aria-pressed',c===cat);
+    b.innerHTML=`${c==='All'?'':'<span class="dot"></span>'}${c==='All'?'All patterns':c}<span class="c">${n}</span>`;
+    b.onclick=()=>{cat=c;renderCats();renderGrid();};
+    catsEl.appendChild(b);
+  });
+}
+renderCats();
+['pictures that slide sideways','box pops up and the page goes dark','boxes for a verification code','little red number on the bell']
  .forEach(t=>{const b=document.createElement('button');b.className='try';b.textContent=t;b.onclick=()=>{q.value=t;switchView('patterns');renderGrid();};document.getElementById('tries').appendChild(b);});
 q.addEventListener('input',()=>{switchView('patterns');renderGrid();});
+
+/* ================= home: hero examples + mixed-up pairs ================= */
+const SHOW=[['pictures that slide sideways','carousel'],['the box that pops up and darkens the page','modal'],['little message that disappears by itself','toast'],
+  ['boxes for a verification code','otp'],['click a question to show the answer','accordion'],['numbers at the bottom to change page','pagination']].filter(([,id])=>byId[id]);
+let showI=0,showTimer=null;
+const reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function paintShow(i,animate=true){
+  showI=(i+SHOW.length)%SHOW.length;
+  const [say,id]=SHOW[showI],sw=document.getElementById('hsSwap');
+  const apply=()=>{document.getElementById('hsSay').textContent=say;document.getElementById('hsName').textContent=byId[id].name;
+    mountDemo(byId[id],document.getElementById('hsDemo'));sw.classList.remove('out');
+    document.querySelectorAll('#hsDots button').forEach((d,k)=>d.classList.toggle('on',k===showI));};
+  if(animate&&!reduceMotion){sw.classList.add('out');setTimeout(apply,260);}else apply();
+}
+function startShow(){stopShow();if(!reduceMotion)showTimer=setInterval(()=>paintShow(showI+1),4200);}
+function stopShow(){clearInterval(showTimer);showTimer=null;}
+const dotsEl=document.getElementById('hsDots');
+SHOW.forEach(([say],k)=>{const d=document.createElement('button');d.setAttribute('aria-label',`Example ${k+1}: ${say}`);d.onclick=()=>{paintShow(k);startShow();};dotsEl.appendChild(d);});
+const heroShow=document.getElementById('heroShow');
+heroShow.addEventListener('mouseenter',stopShow);heroShow.addEventListener('mouseleave',startShow);
+heroShow.addEventListener('focusin',stopShow);heroShow.addEventListener('focusout',startShow);
+document.getElementById('hsTry').onclick=()=>{q.value=SHOW[showI][0];renderGrid();q.focus();};
+paintShow(0,false);startShow();
+
+const MIX=[['tooltip','popover'],['toast','alert'],['tabs','segmented'],['carousel','range']].filter(([a,b])=>byId[a]&&byId[b]);
+const mixEl=document.getElementById('mix');
+MIX.forEach(([a,b])=>{
+  const why=(byId[a].confuse.find(([c])=>c===b)||byId[b].confuse.find(([c])=>c===a)||[,''])[1];
+  const c=document.createElement('button');c.className='mixc';
+  c.innerHTML=`<span class="vs">${byId[a].name}<i>vs</i>${byId[b].name}</span><p>${why}</p><span class="more">Compare →</span>`;
+  c.onclick=e=>openPanel(a,e.currentTarget);mixEl.appendChild(c);
+});
 
 /* ================= sheets ================= */
 const panel=document.getElementById('panel'),sheet=document.getElementById('sheet'),cartWrap=document.getElementById('cartWrap'),cartSheet=document.getElementById('cartSheet');
@@ -370,11 +436,15 @@ function renderDs(){
 const VIEWS=['patterns','features','fonts','design'];
 function switchView(v){
   document.querySelectorAll('.views [role=tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v));
+  const was=document.getElementById('view-'+v).hidden;
   VIEWS.forEach(x=>document.getElementById('view-'+x).hidden=x!==v);
-  catsEl.hidden=v!=='patterns';
+  document.getElementById('home').hidden=v!=='patterns';
+  if(v==='patterns')startShow();else stopShow();
   if(v==='features')renderFeats();if(v==='fonts')renderFonts();if(v==='design')renderDs();
+  if(was&&v!=='patterns')window.scrollTo({top:0});
 }
 document.querySelectorAll('.views [role=tab]').forEach(b=>b.onclick=()=>switchView(b.dataset.v));
+document.querySelector('[data-home]').onclick=e=>{e.preventDefault();switchView('patterns');window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});};
 
 renderGrid();refreshCart();
 const h=location.hash.slice(1);if(byId[h])openPanel(h);else if(VIEWS.includes(h))switchView(h);

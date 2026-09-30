@@ -12,38 +12,72 @@
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand"><h1 class="logo"><span>Whatsit</span></h1><span class="tag">UI words for vibe coders</span></div>
-    <p class="lede">You know what it looks like. Find out what it's called, save what you want, and copy one prompt that builds it all.</p>
-    <div class="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" autocomplete="off" placeholder="Describe it… “pictures that slide sideways”" aria-label="Describe the thing you saw">
-    </div>
-    <div class="tries" id="tries"><small>Try:</small></div>
-    <div class="answer" id="answer" aria-live="polite"></div>
-  </header>
-
-  <div class="bar">
-    <div class="views" role="tablist" aria-label="Library">
+<header class="topbar">
+  <div class="tb-in">
+    <a class="brandmark" href="#" data-home><span>Whatsit</span></a>
+    <nav class="views" role="tablist" aria-label="Sections">
       <button role="tab" data-v="patterns" aria-selected="true">UI patterns</button>
       <button role="tab" data-v="features" aria-selected="false">Feature recipes</button>
       <button role="tab" data-v="fonts" aria-selected="false">Fonts</button>
       <button role="tab" data-v="design" aria-selected="false">Design system</button>
-    </div>
-    <div class="pills" id="cats"></div>
+    </nav>
+    <button class="cartbtn" id="fab" aria-label="Open cart"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/></svg><span class="lbl">Cart</span><span class="n" id="fabN">0</span></button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="home">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="kicker">A visual dictionary of UI · for vibe coders</p>
+        <h1 class="hero-h">You know what it looks like. <em>Now know what it’s <span class="hl">called</span>.</em></h1>
+        <p class="lede">Describe any piece of an app in your own words. Whatsit names it, shows you its parts, and writes the prompt your AI needs to build it.</p>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="q" type="search" autocomplete="off" placeholder="Describe it… “pictures that slide sideways”" aria-label="Describe the thing you saw">
+        </div>
+        <div class="tries" id="tries"><small>Try</small></div>
+        <div class="answer" id="answer" aria-live="polite"></div>
+      </div>
+      <figure class="hero-show" id="heroShow" aria-label="Examples of plain descriptions and their UI names">
+        <div class="hs-swap" id="hsSwap">
+          <div class="hs-quote">“<span id="hsSay"></span>”</div>
+          <div class="hs-arrow">is called a</div>
+          <div class="hs-name"><span id="hsName"></span></div>
+        </div>
+        <div class="demo hs-demo" id="hsDemo"></div>
+        <div class="hs-foot"><div class="hs-dots" id="hsDots"></div><button class="hs-try" id="hsTry">Search this →</button></div>
+      </figure>
+    </section>
+
+    <ol class="how">
+      <li><b class="n">1</b><div><h3>Describe what you saw</h3><p>“The box that pops up and darkens the page.” Your words are enough.</p></div></li>
+      <li><b class="n">2</b><div><h3>Learn its name and parts</h3><p>Modal: backdrop, dialog, actions. Now you can ask for it precisely.</p></div></li>
+      <li><b class="n">3</b><div><h3>Copy one prompt</h3><p>Save patterns, fonts and colors to your cart, then paste one prompt into your AI.</p></div></li>
+    </ol>
+
+    <section>
+      <div class="sec-head"><div><p class="kicker">Know the difference</p><h2>Commonly mixed up</h2></div><p>Picking the wrong word gets you the wrong thing. These pairs trip up almost everyone.</p></div>
+      <div class="mix" id="mix"></div>
+    </section>
   </div>
 
   <main>
-    <section id="view-patterns"><div id="grid" class="grid"></div></section>
+    <section id="view-patterns">
+      <div class="sec-head"><div><p class="kicker">The library</p><h2>UI patterns <span class="count" id="pcount"></span></h2></div><p>Every pattern has a live demo, the names people use for it, its parts, and a prompt you can tailor.</p></div>
+      <div class="lib-body">
+        <nav class="catnav" id="cats" aria-label="Categories"></nav>
+        <div id="grid" class="grid"></div>
+      </div>
+    </section>
 
     <section id="view-features" hidden>
-      <p class="intro">Features are built from patterns. Once you know the words, you can ask for a whole feature at once and name every part of it.</p>
+      <div class="sec-head"><div><p class="kicker">Build bigger</p><h2>Feature recipes</h2></div><p>Features are built from patterns. Once you know the words, you can ask for a whole feature at once and name every part of it.</p></div>
       <div class="feats" id="featList"></div>
     </section>
 
     <section id="view-fonts" hidden>
-      <p class="intro">Pick one font for headings and one for body text. Your picks go into your design system and your cart.</p>
+      <div class="sec-head"><div><p class="kicker">Type</p><h2>Fonts</h2></div><p>Pick one font for headings and one for body text. Your picks go into your design system and your cart.</p></div>
       <div class="fsub" id="fsub"></div>
       <div id="fonts-text">
         <dl class="gloss" id="gloss"></dl>
@@ -65,7 +99,7 @@
     </section>
 
     <section id="view-design" hidden>
-      <p class="intro">Pick a starting palette, then adjust any color. The preview on the right updates as you go.</p>
+      <div class="sec-head"><div><p class="kicker">Look and feel</p><h2>Design system</h2></div><p>Pick a starting palette, then adjust any color. The preview updates as you go.</p></div>
       <div class="ds">
         <div class="ds-ctl" id="dsCtl"></div>
         <div class="ds-side">
@@ -91,7 +125,13 @@
   </main>
 </div>
 
-<button class="fab" id="fab" aria-label="Open cart"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.2"/><circle cx="17" cy="20.5" r="1.2"/></svg><span class="lbl">Cart</span><span class="n" id="fabN">0</span></button>
+<footer class="foot">
+  <div class="foot-in">
+    <span><b>Whatsit Library</b> · open source under the MIT license</span>
+    <span><a href="https://github.com/BLIZZARD2306/whatsit-library">GitHub</a> · <a href="https://github.com/BLIZZARD2306/whatsit-library/blob/main/CONTRIBUTING.md">Add a pattern</a></span>
+  </div>
+</footer>
+
 <div class="gtoast" id="gtoast" role="status" aria-live="polite"></div>
 
 <aside class="sheet-wrap" id="panel" hidden><div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="p-title" id="sheet"></div></aside>
