@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brisa | Sparkling, zero sugar</title>
+<meta name="description" content="Brisa sparkling water: real fruit, fine bubbles, zero sugar. A Whatsit Library template.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+/* Product Showcase Hero: a Whatsit Library template (MIT). Brand, copy and artwork are fictional. */
+@property --c1 { syntax: "<color>"; inherits: true; initial-value: #e0344f; }
+@property --c2 { syntax: "<color>"; inherits: true; initial-value: #7d0f24; }
+@property --c3 { syntax: "<color>"; inherits: true; initial-value: #1a0207; }
+
+:root {
+  --accent: #ffd2dc;
+  --on-accent: #3a0814;
+  --glass: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.2);
+  --muted: rgba(255, 255, 255, 0.72);
+  --script: "Pacifico", cursive;
+  --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+body[data-flavour="lime"]  { --c1: #8fd14f; --c2: #1f6e2f; --c3: #031309; --accent: #e8ffbf; --on-accent: #12300d; }
+body[data-flavour="berry"] { --c1: #6274f2; --c2: #1e2780; --c3: #04071a; --accent: #dadfff; --on-accent: #10164a; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  overflow: hidden;
+  color: #fff;
+  font-family: var(--sans);
+  background: radial-gradient(120% 95% at 50% 55%, var(--c1) 0%, var(--c2) 46%, var(--c3) 100%);
+  transition: --c1 1.2s cubic-bezier(0.4, 0, 0.2, 1), --c2 1.2s cubic-bezier(0.4, 0, 0.2, 1), --c3 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+
+/* ---------- layers ---------- */
+.bubbles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bubbles i {
+  position: absolute; bottom: -40px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.9) 0 8%, rgba(255,255,255,.18) 22%, rgba(255,255,255,.04) 60%, rgba(255,255,255,.35) 100%);
+  animation: rise linear forwards;
+}
+@keyframes rise {
+  0% { transform: translate(0, 0) scale(.7); opacity: 0; }
+  12% { opacity: var(--o); }
+  88% { opacity: var(--o); }
+  100% { transform: translate(var(--dx), -112vh) scale(1); opacity: 0; }
+}
+#stage { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; opacity: 0; transition: opacity 1.2s ease 0.2s; }
+body.ready #stage { opacity: 1; }
+.grain { position: fixed; inset: 0; z-index: 20; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* ---------- header ---------- */
+.hd { position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding: 24px 4%; }
+.logo { justify-self: start; display: flex; align-items: center; gap: 10px; font: 400 26px/1 var(--script); text-decoration: none; color: #fff; padding: 4px 0; }
+.logo svg { width: 30px; height: 30px; flex: none; }
+.nav { display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 8px 30px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.15); }
+.nav button { border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1; padding: 11px 18px; border-radius: 999px; transition: background .3s, color .3s; }
+.nav button:hover { color: #fff; background: rgba(255,255,255,.1); }
+.nav button[aria-current="true"] { background: var(--accent); color: var(--on-accent); }
+.actions { justify-self: end; display: flex; align-items: center; gap: 10px; }
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border: 0; border-radius: 999px; padding: 0 24px; background: rgba(0,0,0,.42); font-size: 14px; font-weight: 700; line-height: 1; cursor: pointer; transition: background .3s, transform .3s; }
+.pill:hover { background: rgba(0,0,0,.62); transform: translateY(-2px); }
+.icon-btn { position: relative; width: 46px; height: 46px; padding: 0; border-radius: 50%; }
+.icon-btn svg, .pill svg { width: 20px; height: 20px; flex: none; }
+.count { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; display: grid; place-items: center;
+  background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 800; line-height: 1; transform: scale(0); transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+.count.on { transform: scale(1); }
+.count.bump { animation: bump .45s cubic-bezier(.34,1.56,.64,1); }
+@keyframes bump { 40% { transform: scale(1.35); } }
+.menu-btn { display: none; }
+
+/* ---------- hero columns ---------- */
+.hero { position: relative; height: 100%; display: flex; justify-content: space-between; gap: 32px; padding: 128px 4% 44px; }
+.col { display: flex; flex-direction: column; height: 100%; }
+.left { gap: 26px; max-width: 460px; }
+.right { align-items: flex-end; justify-content: space-between; text-align: right; }
+.big { font: 400 clamp(64px, 9.4vw, 172px)/0.86 var(--script); white-space: nowrap; text-shadow: 0 10px 40px rgba(0,0,0,.18); }
+.big span { display: block; overflow: hidden; padding: 0 .08em .14em; margin: 0 -.08em -.14em; }
+.big span i { display: inline-block; font-style: normal; transform: translateY(110%) rotate(6deg); animation: wordIn 1s var(--ease) forwards; animation-delay: calc(.35s + var(--i) * .12s); }
+@keyframes wordIn { to { transform: none; } }
+.lede { color: var(--muted); font-size: 17px; line-height: 1.6; max-width: 380px; min-height: 3.2em; opacity: 0; animation: fadeUp .9s var(--ease) .8s forwards; transition: opacity .35s; }
+.lede.swap { opacity: .0 !important; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.cta { display: inline-flex; align-items: center; gap: 18px; width: fit-content; height: 54px; border: 0; cursor: pointer; padding: 0 6px 0 26px; border-radius: 999px;
+  background: rgba(0,0,0,.42); font-weight: 800; font-size: 15px; line-height: 1; transition: background .3s, transform .3s; opacity: 0; animation: fadeUp .9s var(--ease) .95s forwards; }
+.cta:hover { background: rgba(0,0,0,.62); transform: translateY(-3px); }
+.cta .plus { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--on-accent); transition: background .6s, transform .4s var(--ease); }
+.cta .plus svg { width: 18px; height: 18px; display: block; }
+.cta:hover .plus { transform: rotate(90deg); }
+.lede, .cta, .award { position: relative; z-index: 4; }   /* readable copy and controls sit above the 3D layer; the headlines stay behind it */
+.award { margin-top: auto; display: flex; align-items: center; gap: 14px; opacity: 0; animation: fadeUp .9s var(--ease) 1.1s forwards; }
+.award .ico { width: 50px; height: 50px; flex: none; display: grid; place-items: center; border-radius: 14px; background: var(--glass); border: 1px solid var(--line); }
+.award small { display: block; font-size: 11px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+.award strong { display: block; font-size: 14px; }
+
+/* ---------- flavour picker ---------- */
+.picker { position: relative; z-index: 6; margin-top: 48px; display: flex; flex-direction: column; align-items: flex-end; gap: 16px; opacity: 0; animation: fadeUp .9s var(--ease) 1s forwards; }
+.cards { display: flex; gap: 14px; }
+.flav { position: relative; width: 132px; padding: 74px 12px 14px; border-radius: 26px; cursor: pointer; text-align: center;
+  background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: background .3s, border-color .3s, transform .4s cubic-bezier(.175,.885,.32,1.275); }
+.flav:hover { background: rgba(255,255,255,.14); transform: translateY(-4px); }
+.flav[aria-checked="true"] { border-color: var(--accent); background: rgba(255,255,255,.12); }
+.flav img { position: absolute; left: 50%; top: -40px; width: 72px; translate: -50% 0; filter: drop-shadow(0 18px 22px rgba(0,0,0,.45)); transition: transform .5s cubic-bezier(.34,1.56,.64,1), filter .3s; pointer-events: none; }
+.flav:hover img { transform: translateY(-12px) rotate(-10deg) scale(1.08); }
+.flav[aria-checked="false"] img { filter: drop-shadow(0 18px 22px rgba(0,0,0,.45)) saturate(.75) brightness(.85); }
+.flav .n { display: block; font-size: 13px; font-weight: 700; }
+.flav .p { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.arrows { display: flex; gap: 10px; }
+.round { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 1px solid var(--line); background: var(--glass); cursor: pointer; display: grid; place-items: center; transition: background .3s; }
+.round:hover { background: rgba(255,255,255,.16); }
+.round svg { width: 16px; height: 16px; display: block; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:is(.flav, .round, .cta, .pill, .nav button, .logo, .sheet button, .sheet input, .sheet a):focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* ---------- side sheet (menu, flavours, ingredients, story, stockists, shop, bag) ---------- */
+.scrim { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.35); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .35s; }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.sheet { position: fixed; top: 12px; right: 12px; bottom: 12px; z-index: 31; width: min(440px, calc(100% - 24px)); display: flex; flex-direction: column;
+  border-radius: 28px; border: 1px solid var(--line); background: color-mix(in srgb, var(--c3) 72%, transparent); backdrop-filter: blur(28px) saturate(1.3); -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  box-shadow: 0 30px 80px rgba(0,0,0,.45); transform: translateX(calc(100% + 24px)); transition: transform .5s var(--ease), visibility 0s .5s; visibility: hidden; }
+.sheet.open { transform: none; visibility: visible; transition: transform .5s var(--ease); }
+.sheet-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 22px 22px 6px 26px; }
+.sheet-hd h2 { font: 400 34px/1.1 var(--script); }
+.sheet-bd { flex: 1; overflow-y: auto; padding: 12px 26px 26px; display: flex; flex-direction: column; gap: 18px; }
+.sheet-ft { padding: 16px 22px 22px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.sheet p { color: var(--muted); line-height: 1.6; font-size: 15px; }
+.sheet h3 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.list li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--glass); border: 1px solid var(--line); font-size: 14px; }
+.list li span:last-child { color: var(--muted); text-align: right; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl td { padding: 9px 0; border-bottom: 1px solid var(--line); }
+.tbl td:last-child { text-align: right; font-weight: 700; }
+.menu-links { display: flex; flex-direction: column; gap: 6px; }
+.menu-links button { text-align: left; border: 0; background: var(--glass); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; font-size: 18px; font-weight: 700; cursor: pointer; transition: background .3s; }
+.menu-links button:hover { background: rgba(255,255,255,.14); }
+.fl-row { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; padding: 12px; border-radius: 18px; background: var(--glass); border: 1px solid var(--line); }
+.fl-row img { width: 54px; justify-self: center; filter: drop-shadow(0 10px 12px rgba(0,0,0,.4)); }
+.fl-row b { display: block; font-size: 15px; }
+.fl-row small { display: block; color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 2px; }
+.fl-row[aria-current="true"] { border-color: var(--accent); }
+.mini { height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.1); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.mini:hover { background: rgba(255,255,255,.2); }
+.mini.solid, .wide.solid { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.wide { height: 52px; width: 100%; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.08); font-size: 15px; font-weight: 800; cursor: pointer; transition: transform .3s, background .3s; }
+.wide:hover { transform: translateY(-2px); }
+.wide:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.field { display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 16px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); }
+.field svg { width: 18px; height: 18px; flex: none; opacity: .7; }
+.field input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; color: #fff; font: inherit; font-size: 15px; outline: none; }
+.field input::placeholder { color: var(--muted); }
+.field:focus-within { border-color: #fff; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.seg button { border: 1px solid var(--line); background: var(--glass); border-radius: 16px; padding: 12px 8px; cursor: pointer; text-align: center; transition: border-color .3s, background .3s; }
+.seg button b { display: block; font-size: 15px; }
+.seg button small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.seg button[aria-checked="true"] { border-color: var(--accent); background: rgba(255,255,255,.14); }
+.qty { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); }
+.qty button { width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); font-size: 18px; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+.qty output { min-width: 32px; text-align: center; font-weight: 800; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.total { font-size: 15px; } .total b { font-size: 22px; }
+.empty { text-align: center; padding: 30px 0; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stats div { padding: 14px 10px; border-radius: 16px; background: var(--glass); border: 1px solid var(--line); text-align: center; }
+.stats b { display: block; font: 400 26px/1.2 var(--script); }
+.stats small { color: var(--muted); font-size: 12px; }
+.toast { position: fixed; left: 50%; bottom: 28px; z-index: 40; translate: -50% 20px; opacity: 0; pointer-events: none; padding: 13px 20px; border-radius: 999px;
+  background: rgba(0,0,0,.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 14px; font-weight: 600; transition: opacity .3s, translate .3s var(--ease); max-width: calc(100% - 32px); text-align: center; }
+.toast.show { opacity: 1; translate: -50% 0; }
+
+/* ---------- tablet and phone ---------- */
+@media (max-width: 1200px) {
+  /* Small laptops: the can leans into the top-right, so the cards move to the bottom-right and the second headline steps aside. */
+  .right { justify-content: flex-end; }
+  .right .big { display: none; }
+  .picker { margin-top: 0; }
+}
+@media (max-width: 1100px) {
+  .nav button { padding: 11px 13px; }
+  .hd .find { display: none; }
+}
+@media (max-width: 900px) {
+  .hd { grid-template-columns: 1fr auto; padding: 16px 5%; }
+  .nav { display: none; }
+  .menu-btn { display: grid; }
+  .hero { flex-direction: column; justify-content: space-between; align-items: center; gap: 0; padding: 92px 6% 24px; text-align: center; }
+  .left { position: relative; z-index: 4; align-items: center; gap: 14px; max-width: none; height: auto; }
+  .left .big { font-size: clamp(56px, 16vw, 92px); }
+  .lede { font-size: 15px; max-width: 320px; min-height: 0; text-shadow: 0 1px 12px rgba(0,0,0,.25); }
+  .cta { height: 50px; }
+  .award { display: none; }
+  .right { width: 100%; height: auto; align-items: center; text-align: center; }
+  .right .big { display: none; }
+  .picker { margin-top: 0; align-items: center; gap: 12px; }
+  .cards { gap: 10px; }
+  .flav { width: min(132px, 28vw); padding: 58px 8px 12px; border-radius: 22px; }
+  .flav img { width: 54px; top: -30px; }
+  .flav .n { font-size: 12px; }
+}
+@media (max-width: 900px) and (max-height: 700px) {
+  .lede { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
+  .bubbles { display: none; }
+}
+</style>
+</head>
+<body data-flavour="cherry">
+<div class="bubbles" aria-hidden="true"></div>
+
+<header class="hd">
+  <a class="logo" href="#" aria-label="Brisa home">
+    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="3" fill="currentColor"/><circle cx="20" cy="11" r="2" fill="currentColor"/><circle cx="18" cy="20" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    Brisa
+  </a>
+  <nav class="nav" aria-label="Main">
+    <button data-open="home" aria-current="true">Home</button><button data-open="flavours">Flavours</button><button data-open="ingredients">Ingredients</button><button data-open="story">Our story</button><button data-open="stockists">Stockists</button>
+  </nav>
+  <div class="actions">
+    <button class="pill find" data-open="stockists">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Find a store</button>
+    <button class="pill icon-btn" data-open="bag" aria-label="Bag, empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="count" id="bagCount" aria-hidden="true">0</span></button>
+    <button class="pill icon-btn menu-btn" data-open="menu" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg></button>
+  </div>
+</header>
+
+<main class="hero">
+  <section class="col left" aria-labelledby="h1">
+    <h1 class="big" id="h1" aria-label="Pure Fizz"><span aria-hidden="true"><i style="--i:0">Pure</i></span><span aria-hidden="true"><i style="--i:1">Fizz</i></span></h1>
+    <p class="lede" id="lede">Real fruit, fine bubbles and not a gram of sugar. Cold-filled in small batches, so every can tastes like the first.</p>
+    <button class="cta" data-open="shop">Shop the range<span class="plus" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+    <div class="award">
+      <span class="ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg></span>
+      <div><small>Taste awards</small><strong>Gold · Sparkling 2026</strong></div>
+    </div>
+  </section>
+
+  <section class="col right" aria-label="Choose a flavour">
+    <div class="picker">
+      <div class="cards" role="radiogroup" aria-label="Flavour">
+        <button class="flav" role="radio" aria-checked="true" data-f="cherry"><img alt=""><span class="n">Wild Cherry</span><span class="p">$2.49</span></button>
+        <button class="flav" role="radio" aria-checked="false" tabindex="-1" data-f="lime"><img alt=""><span class="n">Lime Zest</span><span class="p">$2.49</span></button>
+        <button class="flav" role="radio" aria-checked="false" tabindex="-1" data-f="berry"><img alt=""><span class="n">Blueberry</span><span class="p">$2.49</span></button>
+      </div>
+      <div class="arrows">
+        <button class="round" data-step="-1" aria-label="Previous flavour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <button class="round" data-step="1" aria-label="Next flavour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <h2 class="big" aria-label="Bright and bold"><span aria-hidden="true"><i style="--i:2">Bright</i></span><span aria-hidden="true"><i style="--i:3">&amp; Bold</i></span></h2>
+  </section>
+</main>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-hd"><h2 id="sheetTitle"></h2>
+    <button class="round" id="sheetClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="sheet-bd" id="sheetBody"></div>
+  <div class="sheet-ft" id="sheetFoot" hidden></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<p class="sr" id="status" aria-live="polite"></p>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ================= settings ================= */
+const FLAVOURS = {
+  cherry: { name: 'Wild Cherry', tag: 'WILD CHERRY', fruit: 'cherry', label: ['#e3354f', '#8a0f26'], rim: 0xff6a85,
+            lede: 'Real fruit, fine bubbles and not a gram of sugar. Cold-filled in small batches, so every can tastes like the first.' },
+  lime:   { name: 'Lime Zest',   tag: 'LIME ZEST',   fruit: 'lime',   label: ['#7cc443', '#226f2c'], rim: 0xc6ff7a,
+            lede: 'Sharp, bright and squeezed fresh. A twist of real lime over the finest bubbles we have ever made.' },
+  berry:  { name: 'Blueberry',   tag: 'BLUEBERRY',   fruit: 'berry',  label: ['#5466e6', '#1d2580'], rim: 0x9aa8ff,
+            lede: 'Deep, dark and gently sweet with nothing added. Wild blueberries meet ice-cold sparkle.' },
+};
+const ORDER = ['cherry', 'lime', 'berry'];
+const STILL = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CAN_TILT = -0.42;          // base lean of the can (radians)
+const MOUSE_LERP = 0.05;         // cursor smoothing
+const REPEL_RADIUS = 0.42;       // in screen space (0..1 of the viewport height)
+const REPEL_FORCE = 1.5;         // world units at full force
+const FRUIT_HOME = [             // [x, y, z]; z > 0 is in front of the can
+  [-2.4, 1.7, 1.6], [2.5, 1.3, 2.1], [1.7, -1.9, 2.4], [-1.5, -2.2, 1.1], [3.7, -0.7, -1.2], [-3.5, 0.3, -1.6],
+  [0.7, 2.7, -2.2], [-1.0, 0.9, 3.0], [3.0, 2.5, -2.6], [-2.9, -2.6, -2.0], [1.2, -0.3, 3.2], [-4.4, -1.3, 0.6],
+];
+const LEAF_HOME = [[-3.9, 2.4, -2.8], [4.3, 1.0, -3.0], [-2.0, -3.0, -3.2], [2.2, -2.9, -1.8]];
+
+/* ================= renderer, scene, light ================= */
+const canvas = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+camera.position.set(0, 0, 15);
+
+const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-4, 6, 8); scene.add(key);
+const rim = new THREE.DirectionalLight(FLAVOURS.cherry.rim, 3.2); rim.position.set(5, 2, -6); scene.add(rim);
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+/* ================= label artwork (drawn, so it is ours) ================= */
+function drawFruitIcon(g, kind, x, y, s) {
+  g.save(); g.translate(x, y);
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(0, 0, s * 1.35, 0, Math.PI * 2); g.fill();
+  if (kind === 'cherry') {
+    g.strokeStyle = '#4b6b22'; g.lineWidth = s * 0.09; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-s * 0.38, s * 0.05); g.quadraticCurveTo(-s * 0.2, -s * 0.6, s * 0.15, -s * 0.85); g.stroke();
+    g.beginPath(); g.moveTo(s * 0.42, s * 0.18); g.quadraticCurveTo(s * 0.35, -s * 0.5, s * 0.15, -s * 0.85); g.stroke();
+    g.fillStyle = '#3f8f3a'; g.beginPath(); g.ellipse(s * 0.45, -s * 0.78, s * 0.32, s * 0.14, -0.4, 0, Math.PI * 2); g.fill();
+    for (const [cx, cy] of [[-s * 0.4, s * 0.32], [s * 0.42, s * 0.45]]) {
+      const gr = g.createRadialGradient(cx - s * 0.12, cy - s * 0.12, s * 0.04, cx, cy, s * 0.42);
+      gr.addColorStop(0, '#ff6b7f'); gr.addColorStop(1, '#a10c25'); g.fillStyle = gr;
+      g.beginPath(); g.arc(cx, cy, s * 0.4, 0, Math.PI * 2); g.fill();
+    }
+  } else if (kind === 'lime') {
+    g.fillStyle = '#3d9a2d'; g.beginPath(); g.arc(0, 0, s * 0.95, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#f2ffd6'; g.beginPath(); g.arc(0, 0, s * 0.82, 0, Math.PI * 2); g.fill();
+    for (let i = 0; i < 9; i++) {
+      const a0 = (i / 9) * Math.PI * 2 + 0.06, a1 = ((i + 1) / 9) * Math.PI * 2 - 0.06;
+      g.fillStyle = i % 2 ? '#a6dd5b' : '#b8e86f';
+      g.beginPath(); g.moveTo(Math.cos((a0 + a1) / 2) * s * 0.08, Math.sin((a0 + a1) / 2) * s * 0.08); g.arc(0, 0, s * 0.74, a0, a1); g.closePath(); g.fill();
+    }
+  } else {
+    for (const [cx, cy, r] of [[-s * 0.38, s * 0.2, 0.42], [s * 0.36, s * 0.28, 0.4], [0, -s * 0.35, 0.44]]) {
+      const gr = g.createRadialGradient(cx - s * 0.1, cy - s * 0.12, s * 0.04, cx, cy, s * r);
+      gr.addColorStop(0, '#7f8cff'); gr.addColorStop(1, '#1b2170'); g.fillStyle = gr;
+      g.beginPath(); g.arc(cx, cy, s * r, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#0f1440'; g.beginPath(); g.arc(cx, cy - s * r * 0.75, s * 0.07, 0, Math.PI * 2); g.fill();
+    }
+  }
+  g.restore();
+}
+
+function paintLabel(f) {
+  const W = 2048, H = 928, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, f.label[0]); bg.addColorStop(1, f.label[1]);
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  g.globalAlpha = 0.07; g.fillStyle = '#fff';                       // printed diagonal sheen bands
+  for (let x = -H; x < W + H; x += 170) { g.beginPath(); g.moveTo(x, H); g.lineTo(x + H * 0.55, 0); g.lineTo(x + H * 0.55 + 56, 0); g.lineTo(x + 56, H); g.fill(); }
+  g.globalAlpha = 1;
+  g.fillStyle = 'rgba(255,255,255,.9)'; g.fillRect(0, H * 0.72, W, 9); g.fillRect(0, H * 0.755, W, 3);
+  const cx = W / 2;
+  drawFruitIcon(g, f.fruit, cx, H * 0.24, 92);
+  g.textAlign = 'center';
+  g.fillStyle = '#fff'; g.font = '250px Pacifico';
+  g.shadowColor = 'rgba(0,0,0,.28)'; g.shadowBlur = 20; g.shadowOffsetY = 10;
+  g.fillText('Brisa', cx, H * 0.66);
+  g.shadowColor = 'transparent';
+  if ('letterSpacing' in g) g.letterSpacing = '14px';
+  g.font = '800 44px "Plus Jakarta Sans"'; g.fillText(`${f.tag} · ZERO SUGAR`, cx, H * 0.86);
+  g.font = '600 32px "Plus Jakarta Sans"'; g.fillText('SPARKLING WATER · 330 ML', cx, H * 0.94);
+  for (const sx of [W * 0.2, W * 0.8]) {                            // side panels
+    g.save(); g.translate(sx, H * 0.42); g.rotate(-Math.PI / 2);
+    g.globalAlpha = 0.9; g.font = '800 58px "Plus Jakarta Sans"'; g.fillText('NATURALLY FIZZY', 0, 20); g.restore();
+  }
+  g.globalAlpha = 0.95; g.fillStyle = '#fff'; g.fillRect(W * 0.03, H * 0.3, 150, 200);   // back: barcode
+  g.fillStyle = '#111';
+  for (let i = 0, x = W * 0.03 + 14; x < W * 0.03 + 136; i++) { const w = [3, 6, 2, 4, 8, 3][i % 6]; g.fillRect(x, H * 0.3 + 16, w, 150); x += w + [4, 3, 6, 2][i % 4]; }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return tex;
+}
+
+/* ================= the can ================= */
+const aluminium = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, metalness: 1, roughness: 0.2 });
+const labelMat = new THREE.MeshPhysicalMaterial({ metalness: 0.55, roughness: 0.26, clearcoat: 1, clearcoatRoughness: 0.06 });
+
+function makeCan() {
+  const g = new THREE.Group();
+  const profile = [
+    [0, 0.1], [0.55, 0.02], [0.82, 0.03], [0.92, 0.12], [0.955, 0.3], [0.955, 3.06], [0.92, 3.28],
+    [0.8, 3.48], [0.775, 3.56], [0.8, 3.6], [0.79, 3.65], [0.72, 3.63], [0.7, 3.57], [0, 3.56],
+  ].map(([x, y]) => new THREE.Vector2(x, y));
+  const body = new THREE.Mesh(new THREE.LatheGeometry(profile, 128), aluminium);
+  g.add(body);
+  const label = new THREE.Mesh(new THREE.CylinderGeometry(0.962, 0.962, 2.7, 128, 1, true, -Math.PI, Math.PI * 2), labelMat);
+  label.position.y = 0.33 + 1.35;
+  g.add(label);
+  const tabShape = new THREE.Shape();                                // pull tab with its finger hole
+  tabShape.absarc(0, 0.12, 0.2, 0, Math.PI, false); tabShape.lineTo(-0.2, -0.22); tabShape.absarc(0, -0.22, 0.2, Math.PI, Math.PI * 2, false); tabShape.lineTo(0.2, 0.12);
+  const hole = new THREE.Path(); hole.absarc(0, 0.1, 0.09, 0, Math.PI * 2, true); tabShape.holes.push(hole);
+  const tab = new THREE.Mesh(new THREE.ExtrudeGeometry(tabShape, { depth: 0.025, bevelEnabled: true, bevelSize: 0.01, bevelThickness: 0.01, bevelSegments: 2 }), aluminium);
+  tab.rotation.x = -Math.PI / 2; tab.position.set(0, 3.585, 0.12);
+  g.add(tab);
+  const rivet = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 20), aluminium); rivet.position.set(0, 3.58, -0.06); g.add(rivet);
+  g.children.forEach((m) => { m.position.y -= 1.82; });               // centre the can on its pivot
+  return { group: g, label };
+}
+
+const can = makeCan();
+const canPivot = new THREE.Group();
+canPivot.add(can.group);
+scene.add(canPivot);
+
+/* ================= fruit (modelled in code) ================= */
+const MAT = {
+  cherry: new THREE.MeshPhysicalMaterial({ color: 0xb30f2c, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.05, sheen: 0.3 }),
+  stem: new THREE.MeshStandardMaterial({ color: 0x5a4020, roughness: 0.7 }),
+  leaf: new THREE.MeshStandardMaterial({ color: 0x3a9a3c, roughness: 0.45, side: THREE.DoubleSide }),
+  berry: new THREE.MeshPhysicalMaterial({ color: 0x2c3480, roughness: 0.5, sheen: 1, sheenColor: new THREE.Color(0x9fb0ff), sheenRoughness: 0.6 }),
+  crown: new THREE.MeshStandardMaterial({ color: 0x141a45, roughness: 0.8 }),
+  rind: new THREE.MeshPhysicalMaterial({ color: 0x2f7d22, roughness: 0.35, clearcoat: 0.6 }),
+};
+const limeFace = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  g.fillStyle = '#2f7d22'; g.fillRect(0, 0, 512, 512);
+  g.fillStyle = '#e4f5b8'; g.beginPath(); g.arc(256, 256, 232, 0, Math.PI * 2); g.fill();
+  for (let i = 0; i < 10; i++) {
+    const a0 = (i / 10) * Math.PI * 2 + 0.05, a1 = ((i + 1) / 10) * Math.PI * 2 - 0.05;
+    const gr = g.createRadialGradient(256, 256, 20, 256, 256, 220); gr.addColorStop(0, '#c9ec7c'); gr.addColorStop(1, '#6fb83a');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(256 + Math.cos((a0 + a1) / 2) * 22, 256 + Math.sin((a0 + a1) / 2) * 22); g.arc(256, 256, 214, a0, a1); g.closePath(); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.MeshPhysicalMaterial({ map: t, roughness: 0.25, clearcoat: 1, transmission: 0, sheen: 0.2 });
+})();
+
+const GEO = {
+  cherry: new THREE.SphereGeometry(0.34, 48, 32).scale(1, 0.9, 1),
+  berry: new THREE.SphereGeometry(0.24, 40, 28).scale(1, 0.86, 1),
+  crown: new THREE.TorusGeometry(0.06, 0.022, 8, 10),
+  lime: new THREE.CylinderGeometry(0.38, 0.38, 0.1, 48),
+  leaf: (() => {
+    const s = new THREE.Shape(); s.moveTo(0, 0); s.bezierCurveTo(0.25, 0.15, 0.3, 0.55, 0, 0.9); s.bezierCurveTo(-0.3, 0.55, -0.25, 0.15, 0, 0);
+    const geo = new THREE.ShapeGeometry(s, 24); const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getY(i) * 3) * 0.06 + Math.abs(p.getX(i)) * 0.25);  // curl it
+    geo.computeVertexNormals(); return geo;
+  })(),
+};
+
+function makeFruit(kind) {
+  const g = new THREE.Group();
+  if (kind === 'cherry') {
+    g.add(new THREE.Mesh(GEO.cherry, MAT.cherry));
+    const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.26, 0), new THREE.Vector3(0.05, 0.6, 0.02), new THREE.Vector3(0.2, 0.95, 0.06)]);
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 16, 0.022, 6), MAT.stem));
+    if (Math.random() > 0.5) { const l = new THREE.Mesh(GEO.leaf, MAT.leaf); l.scale.setScalar(0.45); l.position.set(0.2, 0.93, 0.06); l.rotation.z = -1.1; g.add(l); }
+  } else if (kind === 'berry') {
+    const n = Math.random() > 0.5 ? 2 : 1;
+    for (let i = 0; i < n; i++) {
+      const b = new THREE.Mesh(GEO.berry, MAT.berry); b.position.set(i * 0.36, i * -0.1, i * 0.12); g.add(b);
+      const c = new THREE.Mesh(GEO.crown, MAT.crown); c.position.set(i * 0.36, 0.2 + i * -0.1, i * 0.12); c.rotation.x = Math.PI / 2; g.add(c);
+    }
+  } else if (kind === 'lime') {
+    g.add(new THREE.Mesh(GEO.lime, [MAT.rind, limeFace, limeFace]));
+    g.rotation.x = Math.PI / 2.4;
+  } else {
+    g.add(new THREE.Mesh(GEO.leaf, MAT.leaf)); g.scale.setScalar(1.25);
+  }
+  return g;
+}
+
+const fruitLayer = new THREE.Group(); scene.add(fruitLayer);
+const items = [];
+function addItem(kind, home, isLeaf = false) {
+  const holder = new THREE.Group(); holder.position.set(...home);
+  const mesh = makeFruit(kind); holder.add(mesh);
+  const s = isLeaf ? 1 : 0.85 + Math.random() * 0.6; holder.scale.setScalar(STILL ? s : 0.001);
+  fruitLayer.add(holder);
+  items.push({ holder, mesh, isLeaf, size: s, home: new THREE.Vector3(...home), off: new THREE.Vector2(), target: new THREE.Vector2(),
+    spin: new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), speed: 0.2 + Math.random() * 0.3,
+    phase: Math.random() * Math.PI * 2, dur: 5 + Math.random() * 6, busy: false });
+}
+FRUIT_HOME.forEach((h) => addItem('cherry', h));
+LEAF_HOME.forEach((h) => addItem('leaf', h, true));
+
+/* ================= tiny tween engine ================= */
+const ease = {
+  in: (p) => p * p * p,
+  out: (p) => 1 - Math.pow(1 - p, 3),
+  inOut: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+  back: (p, s = 1.6) => 1 + (s + 1) * Math.pow(p - 1, 3) + s * Math.pow(p - 1, 2),
+};
+const tweens = [];
+function tween({ dur, delay = 0, curve = ease.out, step, done }) {
+  if (STILL) { step(1); done && done(); return; }
+  tweens.push({ start: performance.now() + delay * 1000, dur: dur * 1000, curve, step, done });
+}
+function runTweens(now) {
+  for (let i = tweens.length - 1; i >= 0; i--) {
+    const t = tweens[i]; const p = Math.min(1, (now - t.start) / t.dur);
+    if (p < 0) continue;
+    t.step(t.curve(p));
+    if (p >= 1) { tweens.splice(i, 1); t.done && t.done(); }
+  }
+}
+
+/* ================= state ================= */
+const textures = Object.fromEntries(ORDER.map((k) => [k, null]));
+const canImg = {};                 // rendered mini cans, used on the cards, in the flavour list and in the bag
+let flavour = 'cherry', switching = false, spin = 0, canRise = STILL ? 1 : 0;
+const mouse = new THREE.Vector2(), smooth = new THREE.Vector2(), pointer = new THREE.Vector2(9, 9);
+let pointerSeen = false;
+addEventListener('pointermove', (e) => {
+  mouse.set(e.clientX / innerWidth - 0.5, e.clientY / innerHeight - 0.5);
+  pointer.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  pointerSeen = e.pointerType === 'mouse';
+});
+addEventListener('pointerleave', () => pointer.set(9, 9));
+
+function randomHome() {
+  let x, y;
+  do { x = (Math.random() * 2 - 1) * 4.3; y = (Math.random() * 2 - 1) * 2.8; } while (Math.abs(x) < 1.1 && Math.abs(y) < 1.6);
+  return new THREE.Vector3(x, y, Math.random() * 6.4 - 3.2);
+}
+
+function switchFlavour(next) {
+  if (switching || next === flavour) return;
+  switching = true;
+  const f = FLAVOURS[next];
+  document.body.dataset.flavour = next;
+  document.querySelectorAll('.flav').forEach((b) => { const on = b.dataset.f === next; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
+  const lede = document.getElementById('lede');
+  lede.classList.add('swap');
+  setTimeout(() => { lede.textContent = f.lede; lede.classList.remove('swap'); }, STILL ? 0 : 350);
+  document.getElementById('status').textContent = `${f.name} selected`;
+  if (current === 'flavours' || current === 'ingredients') RENDER[current]();
+  const fromRim = rim.color.clone(), toRim = new THREE.Color(f.rim);
+  tween({ dur: 1.2, curve: ease.inOut, step: (p) => rim.color.copy(fromRim).lerp(toRim, p) });
+
+  // can: wind up a full turn with blur, swap the label at the peak, settle with a back ease
+  tween({ dur: 0.6, curve: ease.in, step: (p) => { spin = p * Math.PI * 2; canvas.style.filter = `blur(${p * 3}px)`; }, done: () => {
+    labelMat.map = textures[next]; labelMat.needsUpdate = true;
+    tween({ dur: 1.4, curve: (p) => ease.back(p, 0.7), step: (p) => { spin = Math.PI * 2 + p * Math.PI * 2; canvas.style.filter = `blur(${(1 - Math.min(1, p * 2)) * 3}px)`; },
+      done: () => { spin = 0; canvas.style.filter = ''; } });
+  } });
+
+  // fruit: implode into the can, change kind, burst out to new spots
+  let left = items.length;
+  items.forEach((it, i) => {
+    it.busy = true;
+    const from = it.holder.position.clone(), s0 = it.holder.scale.x;
+    tween({ dur: 0.5, delay: i * 0.012, curve: ease.in, step: (p) => { it.holder.position.lerpVectors(from, new THREE.Vector3(0, 0, 0), p); it.holder.scale.setScalar(s0 * (1 - p * 0.95)); }, done: () => {
+      if (!it.isLeaf) { it.holder.remove(it.mesh); it.mesh = makeFruit(f.fruit); it.holder.add(it.mesh); }
+      it.home = it.isLeaf ? it.home : randomHome(); it.off.set(0, 0);
+      tween({ dur: 0.9, delay: 0.3, curve: (p) => ease.back(p, 1.5), step: (p) => { it.holder.position.lerpVectors(new THREE.Vector3(0, 0, 0), it.home, p); it.holder.scale.setScalar(it.size * Math.max(0.05, p)); },
+        done: () => { it.busy = false; if (--left === 0) switching = false; } });
+    } });
+  });
+  flavour = next;
+}
+
+/* ================= picker ================= */
+const flavButtons = [...document.querySelectorAll('.flav')];
+flavButtons.forEach((b) => b.addEventListener('click', () => switchFlavour(b.dataset.f)));
+document.querySelector('.cards').addEventListener('keydown', (e) => {
+  const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]; if (!d) return;
+  e.preventDefault(); const n = ORDER[(ORDER.indexOf(flavour) + d + 3) % 3]; switchFlavour(n); flavButtons[ORDER.indexOf(n)].focus();
+});
+document.querySelectorAll('.arrows button').forEach((b) => b.addEventListener('click', () => switchFlavour(ORDER[(ORDER.indexOf(flavour) + +b.dataset.step + 3) % 3])));
+
+/* ================= bubbles ================= */
+const bubbleBox = document.querySelector('.bubbles');
+function bubble() {
+  if (document.hidden) return;
+  const b = document.createElement('i'), s = 8 + Math.random() * 22, d = 5 + Math.random() * 6;
+  b.style.cssText = `left:${Math.random() * 100}%;width:${s}px;height:${s}px;--o:${0.25 + Math.random() * 0.45};--dx:${(Math.random() - 0.5) * 80}px;animation-duration:${d}s`;
+  bubbleBox.appendChild(b); setTimeout(() => b.remove(), d * 1000);
+}
+if (!STILL) setInterval(bubble, 380);
+
+/* ================= sizing + flavour card renders ================= */
+function resize() {
+  const w = innerWidth, h = innerHeight, narrow = w <= 900;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  // Desktop: designed at 1440×860; pull the camera back on smaller or shorter screens so the can never runs under the columns.
+  camera.position.set(0, 0, 15 * Math.max(1, (1440 / w) * 0.9, 860 / h));
+  if (narrow) {
+    // Phones and tablets: fit the can into the gap between the headline block and the flavour cards.
+    const top = document.querySelector('.left').getBoundingClientRect().bottom;
+    const bottom = document.querySelector('.picker').getBoundingClientRect().top - 36;
+    const band = Math.max(160, bottom - top), mid = (top + bottom) / 2;
+    const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const dist = THREE.MathUtils.clamp((4.4 * h) / (band * 2 * tan), 15, 34);
+    const pxPerUnit = h / (2 * dist * tan);
+    camera.position.set(0, (mid - h / 2) / pxPerUnit, dist);
+  }
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+
+function snapshotCans() {          // render each flavour's can once, crop it, and use it on the cards
+  const snapCam = new THREE.PerspectiveCamera(20, renderer.domElement.width / renderer.domElement.height, 0.1, 100);
+  snapCam.position.set(0, 0, 18); fruitLayer.visible = false;
+  canPivot.rotation.set(0.08, -0.35, 0.1); canPivot.position.set(0, 0, 0); canPivot.scale.setScalar(1);
+  snapCam.updateMatrixWorld(); scene.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(canPivot), v = new THREE.Vector3(), W = renderer.domElement.width, H = renderer.domElement.height;
+  let x0 = W, y0 = H, x1 = 0, y1 = 0;
+  for (const cx of [box.min.x, box.max.x]) for (const cy of [box.min.y, box.max.y]) for (const cz of [box.min.z, box.max.z]) {
+    v.set(cx, cy, cz).project(snapCam); const sx = (v.x + 1) / 2 * W, sy = (1 - v.y) / 2 * H;
+    x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+  }
+  const out = document.createElement('canvas'); out.width = 180; out.height = Math.round(180 * (y1 - y0) / (x1 - x0));
+  for (const k of ORDER) {
+    labelMat.map = textures[k]; labelMat.needsUpdate = true;
+    renderer.render(scene, snapCam);
+    const g = out.getContext('2d'); g.clearRect(0, 0, out.width, out.height);
+    g.drawImage(renderer.domElement, x0, y0, x1 - x0, y1 - y0, 0, 0, out.width, out.height);
+    canImg[k] = out.toDataURL('image/png');
+    document.querySelector(`.flav[data-f="${k}"] img`).src = canImg[k];
+  }
+  labelMat.map = textures[flavour]; labelMat.needsUpdate = true; fruitLayer.visible = true;
+}
+
+/* ================= side sheets: menu, flavours, ingredients, story, stockists, shop, bag ================= */
+const INGREDIENTS = {
+  cherry: { list: [['Sparkling spring water', '92%'], ['Cherry juice from concentrate', '4%'], ['Natural cherry flavouring', ''], ['Citric acid', ''], ['Black carrot extract', 'for colour']], kcal: 9, carbs: '1.9 g' },
+  lime:   { list: [['Sparkling spring water', '94%'], ['Lime juice from concentrate', '3%'], ['Natural lime flavouring', ''], ['Citric acid', '']], kcal: 6, carbs: '1.2 g' },
+  berry:  { list: [['Sparkling spring water', '92%'], ['Blueberry juice from concentrate', '4%'], ['Natural blueberry flavouring', ''], ['Citric acid', ''], ['Purple carrot extract', 'for colour']], kcal: 8, carbs: '1.7 g' },
+};
+const STORES = [
+  ['Corner & Co. Market', 'Lisbon', 'Rua das Flores 18'], ['The Fizz Pantry', 'Porto', 'Av. dos Aliados 92'], ['Greenleaf Grocers', 'Madrid', 'Calle de Atocha 41'],
+  ['Harbour Deli', 'Barcelona', 'Passeig del Born 7'], ['Northside Provisions', 'London', '12 Camden Passage'], ['Little Larder', 'Manchester', '4 Tib Street'],
+  ['Canal Street Café', 'Amsterdam', 'Prinsengracht 210'], ['Morning Market', 'Berlin', 'Kastanienallee 35'], ['Blue Door Bodega', 'New York', '88 Orchard St'],
+  ['Sunny Side Store', 'Los Angeles', '1420 Abbot Kinney Blvd'],
+];
+const PACKS = [[4, 8.99], [12, 24.99], [24, 44.99]];
+const TITLES = { menu: 'Menu', flavours: 'Flavours', ingredients: 'Ingredients', story: 'Our story', stockists: 'Find a store', shop: 'Shop the range', bag: 'Your bag' };
+const NAV_SECTIONS = ['flavours', 'ingredients', 'story', 'stockists'];
+const money = (n) => `$${n.toFixed(2)}`;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const bag = [];                               // { flavour, pack, qty }
+const shopPick = { flavour: null, pack: 1, qty: 1 };
+let current = null, lastFocus = null;
+const sheetEl = document.getElementById('sheet'), scrim = document.getElementById('scrim');
+const sheetTitle = document.getElementById('sheetTitle'), sheetBody = document.getElementById('sheetBody'), sheetFoot = document.getElementById('sheetFoot');
+
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function setFoot(html) { sheetFoot.hidden = !html; sheetFoot.innerHTML = html || ''; }
+function bagTotal() { return bag.reduce((s, it) => s + PACKS[it.pack][1] * it.qty, 0); }
+function bagCount() { return bag.reduce((s, it) => s + it.qty, 0); }
+function syncBag() {
+  const n = bagCount(), c = document.getElementById('bagCount');
+  c.textContent = n; c.classList.toggle('on', n > 0);
+  c.classList.remove('bump'); void c.offsetWidth; if (n) c.classList.add('bump');
+  document.querySelector('[data-open="bag"]').setAttribute('aria-label', n ? `Bag, ${n} item${n === 1 ? '' : 's'}` : 'Bag, empty');
+}
+
+const RENDER = {
+  menu() {
+    sheetBody.innerHTML = `<div class="menu-links">${NAV_SECTIONS.map((k) => `<button data-open="${k}">${TITLES[k]}</button>`).join('')}
+      <button data-open="shop">Shop the range</button><button data-open="bag">Your bag${bagCount() ? ` (${bagCount()})` : ''}</button></div>`;
+  },
+  flavours() {
+    sheetBody.innerHTML = `<p>Three flavours, all made with real fruit and zero sugar. Pick one to see it.</p>` + ORDER.map((k) => {
+      const f = FLAVOURS[k], on = k === flavour;
+      return `<div class="fl-row" aria-current="${on}"><img src="${canImg[k] || ''}" alt=""><div><b>${f.name}</b><small>${f.lede}</small></div>
+        <button class="mini ${on ? 'solid' : ''}" data-show="${k}" ${on ? 'aria-pressed="true"' : ''}>${on ? 'Showing' : 'Show me'}</button></div>`;
+    }).join('');
+    sheetBody.querySelectorAll('[data-show]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.show; closeSheet(); setTimeout(() => switchFlavour(k), 250); }));
+  },
+  ingredients() {
+    const f = FLAVOURS[flavour], d = INGREDIENTS[flavour];
+    sheetBody.innerHTML = `<h3>${f.name}</h3>
+      <ul class="list">${d.list.map(([n, v]) => `<li><span>${n}</span><span>${v}</span></li>`).join('')}</ul>
+      <h3>Per 330 ml can</h3>
+      <table class="tbl"><tbody><tr><td>Energy</td><td>${d.kcal} kcal</td></tr><tr><td>Fat</td><td>0 g</td></tr><tr><td>Carbohydrate</td><td>${d.carbs}</td></tr>
+      <tr><td>of which sugars</td><td>0 g</td></tr><tr><td>Protein</td><td>0 g</td></tr><tr><td>Salt</td><td>0.02 g</td></tr></tbody></table>
+      <p>Vegan. No sweeteners, no preservatives, no added sugar. The sugar you can't see is the sugar we didn't put in.</p>`;
+    setFoot(`<button class="wide" data-open="flavours">See other flavours</button>`);
+  },
+  story() {
+    sheetBody.innerHTML = `<p>Brisa started in 2019 in a tiny kitchen with a soda siphon, a crate of market fruit and one rule: if it needs sugar to taste good, it isn't good enough.</p>
+      <p>Today we still press real fruit, still fill cold in small batches, and still taste every run before it leaves the building.</p>
+      <div class="stats"><div><b>0 g</b><small>sugar, ever</small></div><div><b>3</b><small>real-fruit flavours</small></div><div><b>100%</b><small>recyclable cans</small></div></div>`;
+    setFoot(`<button class="wide solid" data-open="shop">Shop the range</button>`);
+  },
+  stockists() {
+    sheetBody.innerHTML = `<label class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="storeQ" type="search" placeholder="Search a city or shop" aria-label="Search a city or shop" autocomplete="off" autofocus></label>
+      <p id="storeN" aria-live="polite"></p><ul class="list" id="storeList"></ul>`;
+    const q = document.getElementById('storeQ'), list = document.getElementById('storeList'), n = document.getElementById('storeN');
+    const draw = () => {
+      const s = q.value.trim().toLowerCase(), hits = STORES.filter((r) => r.join(' ').toLowerCase().includes(s));
+      n.textContent = hits.length ? `${hits.length} store${hits.length === 1 ? '' : 's'}${s ? ` matching “${q.value.trim()}”` : ' stocking Brisa'}` : `No stores match “${q.value.trim()}” yet.`;
+      list.innerHTML = hits.map(([name, city, street]) => `<li><span><b>${esc(name)}</b><br><small style="color:var(--muted)">${esc(street)}</small></span><span>${esc(city)}</span></li>`).join('');
+    };
+    q.addEventListener('input', draw); draw();
+  },
+  shop() {
+    if (!shopPick.flavour) shopPick.flavour = flavour;
+    const draw = () => {
+      sheetBody.innerHTML = `<h3>Flavour</h3><div class="seg" role="radiogroup" aria-label="Flavour">${ORDER.map((k) => `<button role="radio" aria-checked="${k === shopPick.flavour}" data-k="${k}"><b>${FLAVOURS[k].name}</b><small>${money(2.49)} a can</small></button>`).join('')}</div>
+        <h3>Pack size</h3><div class="seg" role="radiogroup" aria-label="Pack size">${PACKS.map(([n, p], i) => `<button role="radio" aria-checked="${i === shopPick.pack}" data-p="${i}"><b>${n} cans</b><small>${money(p)}</small></button>`).join('')}</div>
+        <div class="row"><h3>Quantity</h3><div class="qty"><button data-q="-1" aria-label="One fewer pack">−</button><output aria-live="polite">${shopPick.qty}</output><button data-q="1" aria-label="One more pack">+</button></div></div>`;
+      sheetBody.querySelectorAll('[data-k]').forEach((b) => b.addEventListener('click', () => { shopPick.flavour = b.dataset.k; draw(); sheetBody.querySelector(`[data-k="${b.dataset.k}"]`).focus(); }));
+      sheetBody.querySelectorAll('[data-p]').forEach((b) => b.addEventListener('click', () => { shopPick.pack = +b.dataset.p; draw(); sheetBody.querySelector(`[data-p="${b.dataset.p}"]`).focus(); }));
+      sheetBody.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { shopPick.qty = Math.min(9, Math.max(1, shopPick.qty + +b.dataset.q)); draw(); sheetBody.querySelector(`[data-q="${b.dataset.q}"]`).focus(); }));
+      setFoot(`<div class="row total"><span>Total</span><b>${money(PACKS[shopPick.pack][1] * shopPick.qty)}</b></div><button class="wide solid" id="addBag">Add to bag</button>`);
+      document.getElementById('addBag').addEventListener('click', () => {
+        const hit = bag.find((it) => it.flavour === shopPick.flavour && it.pack === shopPick.pack);
+        if (hit) hit.qty = Math.min(9, hit.qty + shopPick.qty); else bag.push({ flavour: shopPick.flavour, pack: shopPick.pack, qty: shopPick.qty });
+        syncBag();
+        toast(`Added ${shopPick.qty} × ${PACKS[shopPick.pack][0]}-pack of ${FLAVOURS[shopPick.flavour].name}`);
+        shopPick.qty = 1; openSheet('bag');
+      });
+    };
+    draw();
+  },
+  bag() {
+    if (!bag.length) {
+      sheetBody.innerHTML = `<div class="empty"><p>Your bag is empty.</p></div>`;
+      setFoot(`<button class="wide solid" data-open="shop">Shop the range</button>`); return;
+    }
+    sheetBody.innerHTML = bag.map((it, i) => `<div class="fl-row"><img src="${canImg[it.flavour] || ''}" alt=""><div><b>${FLAVOURS[it.flavour].name}</b><small>${PACKS[it.pack][0]}-pack · ${money(PACKS[it.pack][1])}</small></div>
+      <div class="qty"><button data-i="${i}" data-d="-1" aria-label="One fewer ${FLAVOURS[it.flavour].name} pack">−</button><output>${it.qty}</output><button data-i="${i}" data-d="1" aria-label="One more ${FLAVOURS[it.flavour].name} pack">+</button></div></div>`).join('');
+    sheetBody.querySelectorAll('[data-d]').forEach((b) => b.addEventListener('click', () => {
+      const it = bag[+b.dataset.i]; it.qty += +b.dataset.d;
+      if (it.qty <= 0) { bag.splice(+b.dataset.i, 1); toast('Removed from your bag'); }
+      it.qty = Math.min(9, it.qty); syncBag(); RENDER.bag();
+      const again = sheetBody.querySelector(`[data-i="${b.dataset.i}"][data-d="${b.dataset.d}"]`); (again || document.getElementById('sheetClose')).focus();
+    }));
+    setFoot(`<div class="row total"><span>Subtotal</span><b>${money(bagTotal())}</b></div><button class="wide solid" id="checkout">Checkout</button>`);
+    document.getElementById('checkout').addEventListener('click', () => toast('This is a demo store, so nothing was charged.'));
+  },
+};
+
+function openSheet(name, from) {
+  if (name === 'home') { closeSheet(); return; }
+  if (!current) lastFocus = from || document.activeElement;
+  current = name;
+  sheetTitle.textContent = TITLES[name];
+  setFoot('');
+  RENDER[name]();
+  sheetBody.scrollTop = 0;
+  const nav = NAV_SECTIONS.includes(name) ? name : 'home';
+  document.querySelectorAll('.nav button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.open === nav)));
+  sheetEl.classList.add('open'); scrim.classList.add('open');
+  setTimeout(() => (sheetEl.querySelector('[autofocus]') || document.getElementById('sheetClose')).focus(), 60);
+}
+function closeSheet() {
+  if (!current) return;
+  current = null;
+  sheetEl.classList.remove('open'); scrim.classList.remove('open');
+  document.querySelectorAll('.nav button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.open === 'home')));
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-open]');
+  if (t) { e.preventDefault(); openSheet(t.dataset.open, t); }
+});
+document.querySelector('.logo').addEventListener('click', (e) => { e.preventDefault(); closeSheet(); });
+scrim.addEventListener('click', closeSheet);
+document.getElementById('sheetClose').addEventListener('click', closeSheet);
+document.addEventListener('keydown', (e) => {
+  if (!current) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeSheet(); }
+  if (e.key === 'Tab') {            // keep focus inside the open sheet
+    const f = [...sheetEl.querySelectorAll('button, input, a[href]')].filter((x) => !x.disabled && x.offsetParent);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+
+/* ================= frame loop ================= */
+const tmp = new THREE.Vector3();
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (document.hidden) return;
+  const t = now / 1000;
+  runTweens(now);
+  if (!pointerSeen) mouse.set(Math.sin(t * 0.4) * 0.22, Math.cos(t * 0.33) * 0.12);   // idle sway on touch screens
+  smooth.lerp(mouse, STILL ? 1 : MOUSE_LERP);
+
+  const float = STILL ? 0 : Math.sin(t * (Math.PI * 2 / 6)) * 0.14;
+  canPivot.position.y = float - (1 - canRise) * 1.2;
+  canPivot.scale.setScalar(0.86 + canRise * 0.14);
+  canPivot.rotation.set(smooth.y * 0.35, smooth.x * 1.4 + spin - 0.25, CAN_TILT);
+
+  fruitLayer.position.set(smooth.x * 0.9, -smooth.y * 0.6, 0);
+  const aspect = innerWidth / innerHeight;
+  for (const [i, it] of items.entries()) {
+    if (it.busy) continue;
+    tmp.copy(it.home).add(fruitLayer.position).project(camera);
+    const dx = (tmp.x - pointer.x) * aspect, dy = tmp.y - pointer.y, dist = Math.hypot(dx, dy) / 2;
+    it.target.set(0, 0); let boost = 1;
+    if (dist < REPEL_RADIUS) { const f = (REPEL_RADIUS - dist) / REPEL_RADIUS; it.target.set(dx / (dist * 2 + 1e-4), dy / (dist * 2 + 1e-4)).multiplyScalar(f * REPEL_FORCE); boost = 1 + f * 5; }
+    it.off.lerp(it.target, 0.1);
+    const ph = (t + i * 0.7) * (Math.PI * 2 / it.dur);
+    it.holder.position.set(it.home.x + it.off.x, it.home.y + it.off.y + (STILL ? 0 : Math.sin(ph) * 0.16), it.home.z);
+    if (!STILL) it.mesh.rotateOnAxis(it.spin, 0.004 * it.speed * boost * 2.5);
+  }
+  renderer.render(scene, camera);
+}
+
+/* ================= start ================= */
+await document.fonts.load('250px Pacifico');
+await document.fonts.load('800 44px "Plus Jakarta Sans"');
+ORDER.forEach((k) => { textures[k] = paintLabel(FLAVOURS[k]); });
+labelMat.map = textures.cherry;
+resize();
+snapshotCans();
+document.body.classList.add('ready');
+tween({ dur: 1.4, delay: 0.25, curve: ease.out, step: (p) => { canRise = p; } });
+items.forEach((it, i) => tween({ dur: 1, delay: 0.6 + i * 0.05, curve: (p) => ease.back(p, 1.4), step: (p) => it.holder.scale.setScalar(it.size * Math.max(0.001, p)) }));
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

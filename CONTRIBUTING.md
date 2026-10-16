@@ -27,6 +27,32 @@ writing matters as much as code.
    card and in the detail panel, and check it in both light and dark mode.
 6. Open a pull request with a screenshot of the card.
 
+## Add an animation
+
+Animations are full templates, so they live in their own section and folder.
+
+1. Copy `data/animations/_template.js` to `data/animations/<id>.js`.
+2. Fill in every field. On top of a pattern's fields, an animation needs:
+   - `kind`: Backgrounds, Text, Scroll, 3D or Pages
+   - `tech`: what it's built with, in one sentence
+   - `motion`: the timing, easing and distances that make it feel right
+   - `build`: at least 3 build steps, in order
+   - `perf`: how to keep it smooth on a cheap phone
+   - for Pages, `uses` (animation ids) and `patterns` (UI pattern ids)
+3. Add the id to `data/animations/index.js`, run `node tests/validate.js`, and
+   check the demo in the card and the detail panel.
+4. Make it original. Don't copy templates, prompts or code from paid libraries
+   or other people's sites; describe the technique in your own words.
+
+For a whole-page template, build it as one self-contained file at
+`templates/<id>.html` and set `page: 'templates/<id>.html'` instead of `html`.
+Whatsit shows it live in a scaled 1440px frame, adds an "Open full page" link,
+and puts its complete source into the prompt. Use a fictional brand, and only
+assets you made or that are openly licensed (CC0, MIT, SIL OFL).
+
+For canvas demos, use `Whatsit.loop(root, t => …)` (it pauses off screen and
+draws one still frame under reduced motion) and `Whatsit.fitCanvas(canvas)`.
+
 ## Writing guidelines
 
 Write for someone who has never heard the word you're teaching.

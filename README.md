@@ -20,6 +20,15 @@ fills that gap.
   - when to use it and when not to
   - "Don't mix it up with" links (Tooltip vs Popover, Toast vs Alert banner)
   - a prompt builder: tick the options you want and copy the prompt
+- **13 animation templates** in their own Animation section: mesh gradient,
+  spotlight panel, dot grid wave, staggered text reveal, text scramble, scroll
+  reveal, stacking cards, parallax layers, 3D tilt card, particle globe,
+  iridescent orb, a product showcase hero and a whole cinematic landing page. They're bigger than
+  patterns: each has a live demo, its layers, the exact timing and easing,
+  step-by-step build instructions and a full prompt. The biggest ones, like
+  the Product Showcase Hero (a real 3D can built in Three.js), are complete
+  pages: Whatsit shows them live, and their prompt includes the full source so
+  your AI can recreate them exactly.
 - **Search in plain words**: type "box pops up and the page goes dark" and it
   answers *Modal*.
 - **15 feature recipes**: Checkout, Login & sign up, Dashboard, Admin panel, Landing page…
@@ -28,7 +37,7 @@ fills that gap.
   use (Google Fonts, SIL Open Font License), with mood filters and a font glossary.
 - **Design system builder**: 12 palettes, colors explained in plain words,
   typography, corners, shadows, a live preview and a readability check.
-- **Cart**: save patterns, recipes, fonts and your design system, then copy
+- **Cart**: save patterns, animations, recipes, fonts and your design system, then copy
   everything as **one combined prompt**.
 
 Every prompt is framework-neutral. It tells the AI to use whatever framework and
@@ -51,12 +60,16 @@ Open http://localhost:8000. Opening `index.html` directly also works.
 ```
 index.html                page markup
 css/styles.css            app styles + shared demo styles
-js/boot.js                loads every pattern file, then the app
+js/boot.js                loads every pattern and animation file, then the app
 js/app.js                 search, views, prompt builder, cart, design system
 data/registry.js          the Whatsit object that data files write into
 data/patterns/index.js    list of pattern files, in display order
 data/patterns/<id>.js     one file per pattern: text, demo, options and its own CSS
 data/patterns/_template.js  copy this to add a pattern
+data/animations/index.js  list of animation files, in display order
+data/animations/<id>.js   one file per animation template: text, motion spec, build steps, demo
+data/animations/_template.js  copy this to add an animation
+templates/<id>.html       full-page templates: shown live in Whatsit, and pasted into their prompt
 data/recipes.js           feature recipes
 data/fonts.js             everyday fonts, display fonts, font glossary
 data/palettes.js          design-system starting palettes
