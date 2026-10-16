@@ -12,6 +12,10 @@ const byId=Object.fromEntries(P.map(p=>[p.id,p]));
 const FEATS = Whatsit.recipes;
 const featById=Object.fromEntries(FEATS.map(f=>[f.id,f]));
 
+/* ================= animations (full templates) ================= */
+const A = Whatsit.animations;
+const animById=Object.fromEntries(A.map(a=>[a.id,a]));
+
 /* ================= fonts ================= */
 const FB={'Sans-serif':'system-ui, sans-serif','Serif':'Georgia, serif','Display':'system-ui, sans-serif','Monospace':'ui-monospace, monospace','Handwritten':'cursive'};
 const FONTS = Whatsit.fonts;
@@ -56,6 +60,7 @@ function dropCart(k,msg){cart=cart.filter(x=>x.k!==k);store.set('whatsit-cart',c
 function itemLabel(it){
   if(it.type==='pattern')return[byId[it.id].name,'UI pattern'];
   if(it.type==='feat')return[featById[it.id].name,'Feature · '+featById[it.id].uses.map(u=>byId[u].name).join(' + ')];
+  if(it.type==='anim')return[animById[it.id].name,'Animation · '+animById[it.id].kind];
   if(it.type==='font')return[ds[it.role],it.role==='heading'?'Headings font':'Body font'];
   if(it.type==='ds')return['Design system',`${ds.preset==='Custom'?'Custom':ds.preset} palette · ${ds.heading} / ${ds.body}`];
 }
@@ -70,6 +75,45 @@ function patternSpec(p,picked){
 }
 function patternPrompt(p,picked){
   return [`Build a ${p.name.toLowerCase()} component.`,'',PROJECT_LINE,'',patternSpec(p,picked),'','Make it one reusable component with sample content I can replace, and show an example of it in use.'].join('\n');
+}
+function animSpec(a,picked){
+  const l=[`${a.name} (also called “${a.aka[0]}”): ${a.say}`,`Built with: ${a.tech}`];
+  if(a.uses&&a.uses.length)l.push('','Combine these animations:',...a.uses.map(u=>`- ${animById[u].name}: ${animById[u].say}`));
+  if(a.patterns&&a.patterns.length)l.push('','And these UI patterns:',...a.patterns.map(u=>`- ${byId[u].name}: ${byId[u].say}`));
+  l.push('','Layers and parts:',...a.parts.map(([n,d])=>`- ${n}: ${d}`));
+  l.push('','Motion (match these numbers):',...a.motion.map(([n,d])=>`- ${n}: ${d}`));
+  l.push('','Build it step by step:',...a.build.map((s,i)=>`${i+1}. ${s}`));
+  const inc=a.opts.filter((o,i)=>picked[i]).map(o=>'- '+o[1]);
+  if(inc.length)l.push('','Include:',...inc);
+  l.push('','Performance: '+a.perf,'Accessibility: '+a.a11y);
+  return l.join('\n');
+}
+function animPrompt(a,picked){
+  const page=a.kind==='Pages';
+  return [`Build this ${page?'full page':'animation'} as a complete, production-ready template: ${a.name}.`,'',PROJECT_LINE,'',animSpec(a,picked),'',
+    page?'Use realistic sample content I can replace, and keep each animated piece as its own reusable component.'
+        :'Make it one reusable component with its colours and content passed in as props or CSS variables, show it in a demo section, and make it look right from 375px phones to wide desktops.'].join('\n');
+}
+// Full templates get a "recreate this exactly" prompt with the page's complete source.
+function pagePrompt(a,picked,src){
+  const url=new URL(a.page,location.href).href;
+  const L=[`# Recreate this page as one self-contained index.html: ${a.name}`,'',
+    'You are a senior creative front-end developer. Build a single index.html that reproduces the reference below exactly: the same layout, visuals, motion and interaction. Plain HTML, CSS and JavaScript in one file with no build step. Load only the libraries the reference loads, from the same CDN URLs.',
+    'If my project already uses a framework, port it into a component there instead, keeping every value the same.','',
+    '## What it is',a.say,'','## Built with',a.tech];
+  if(a.uses&&a.uses.length)L.push('','## Combines these animations',...a.uses.map(u=>`- ${animById[u].name}: ${animById[u].say}`));
+  if(a.patterns&&a.patterns.length)L.push('','## And these UI patterns',...a.patterns.map(u=>`- ${byId[u].name}: ${byId[u].say}`));
+  L.push('','## Layers and parts',...a.parts.map(([n,d])=>`- ${n}: ${d}`),'','## Motion (match these numbers)',...a.motion.map(([n,d])=>`- ${n}: ${d}`),
+    '','## How it is built',...a.build.map((s,i)=>`${i+1}. ${s}`));
+  const inc=a.opts.filter((o,i)=>picked[i]).map(o=>'- '+o[1]),exc=a.opts.filter((o,i)=>!picked[i]).map(o=>'- '+o[1]);
+  if(inc.length)L.push('','## Keep',...inc);
+  if(exc.length)L.push('','## Leave out (remove it from the reference)',...exc);
+  L.push('','## Performance',a.perf,'','## Accessibility',a.a11y,'',
+    '## Make it yours','Keep the structure, timing and interactions. Then swap the brand name, colours, copy and product for mine when I give them. The reference brand, copy and artwork are fictional placeholders.','');
+  if(src===null)L.push('## Reference source','(Loading the full source…)');
+  else if(src)L.push('## Reference source (complete, reproduce it exactly)','','```html',src.trim(),'```');
+  else L.push('## Reference source',`Open ${url} and copy its full source. (It couldn't be loaded here; this happens when Whatsit is opened as a local file.)`);
+  return L.join('\n');
 }
 const featSpec=f=>[`${f.name}: ${f.say}`,'Use these UI patterns:',...f.spec.map(s=>'- '+s)].join('\n');
 const featPrompt=f=>[`Build a ${f.name.toLowerCase()}.`,'',PROJECT_LINE,'',featSpec(f),'','Use realistic sample data. Keep each pattern as its own component so I can reuse it.'].join('\n');
@@ -112,6 +156,11 @@ function cartPrompt(){
     L.push('',`## ${++n}. Features to build`);
     f.forEach((it,i)=>L.push('',`### ${i+1}. ${featSpec(featById[it.id])}`));
     p.forEach((it,i)=>L.push('',`### ${f.length+i+1}. ${patternSpec(byId[it.id],it.picked)}`));
+  }
+  const a=has('anim');
+  if(a.length){
+    L.push('',`## ${++n}. Animations`,'Full templates. Follow the motion numbers and build steps closely.');
+    a.forEach((it,i)=>{const x=animById[it.id];L.push('',`### ${i+1}. ${animSpec(x,it.picked)}`);if(x.page)L.push(`Full reference page (copy its complete source and match it): ${new URL(x.page,location.href).href}`);});
   }
   L.push('','Build these in the order listed, reusing components between features where they overlap. After each one, tell me how to test it.');
   return L.join('\n');
@@ -166,6 +215,16 @@ function score(p,q){
 const grid=document.getElementById('grid'),answer=document.getElementById('answer'),q=document.getElementById('q');
 let cat='All';
 const mountDemo=(p,host)=>{host.innerHTML=p.html(++uid);if(p.init)p.init(host);};
+// Full-page templates preview the real page in a scaled-down 1440px-wide frame.
+const FRAME_W=1440;
+function mountAnimDemo(a,host){
+  if(!a.page)return mountDemo(a,host);
+  host.classList.add('framed');
+  host.innerHTML=`<iframe src="${a.page}" title="${esc(a.name)}: live preview" loading="lazy" tabindex="-1"></iframe>`;
+  const f=host.firstElementChild;
+  const fit=()=>{const w=host.clientWidth||1,h=host.clientHeight||1,k=w/FRAME_W;f.style.height=Math.round(h/k)+'px';f.style.transform=`scale(${k})`;};
+  fit();if(typeof ResizeObserver==='function')new ResizeObserver(fit).observe(host);
+}
 // Category order and one-line descriptions for the grouped library view.
 const CATS=[['Forms','Ways people type, pick and choose.'],['Navigation','How people move around an app.'],['Overlays','Things that float above the page.'],
   ['Feedback','How the app talks back.'],['Layout','How content is arranged.'],['Data','Ways to show records, people and history.'],['Media','Pictures and motion.']]
@@ -288,8 +347,44 @@ function openPanel(id,from){
   showSheet(panel,from);
 }
 
+function openAnim(id,from){
+  const a=animById[id];if(!a)return;
+  const key='anim:'+id,existing=cart.find(i=>i.k===key);
+  const picked=existing?existing.picked.slice():defaultPicked(a);
+  const links=(ids,kind)=>ids.map(x=>`<button data-${kind}="${x}"><b>${kind==='anim'?animById[x].name:byId[x].name}</b> · ${kind==='anim'?'animation':'UI pattern'}</button>`).join('');
+  const from_=[...(a.uses||[]).map(x=>[x,'anim']),...(a.patterns||[]).map(x=>[x,'go'])];
+  cartWrap.hidden=true;
+  sheet.innerHTML=`
+    <div class="s-top"><div><div class="eyebrow">Animation · ${a.kind} · Full template</div><h2 id="p-title"><span>${a.name}</span></h2><div class="aka">also called ${a.aka.join(', ')}</div></div><button class="x" data-close aria-label="Close">×</button></div>
+    <div class="demo"></div>
+    ${a.page?`<div class="acts-row"><a class="save" href="${a.page}" target="_blank" rel="noopener">Open full page ↗</a><span class="aka">Live, exactly as it ships. Move your mouse and pick a flavour.</span></div>`:''}
+    <section><h3>In plain words</h3><p>${a.say}</p></section>
+    <div class="two"><section><h3>Use it when</h3><p>${a.use}</p></section><section><h3>Skip it when</h3><p>${a.avoid}</p></section></div>
+    <section><h3>Built with</h3><p>${a.tech}</p></section>
+    ${from_.length?`<section><h3>Built from</h3><div class="conf">${from_.map(([x,k])=>links([x],k)).join('')}</div></section>`:''}
+    <section><h3>Layers and parts</h3><dl class="parts">${a.parts.map(([n,d])=>`<dt>${n}</dt><dd>${d}</dd>`).join('')}</dl></section>
+    <section><h3>Motion</h3><dl class="parts motion">${a.motion.map(([n,d])=>`<dt>${n}</dt><dd>${d}</dd>`).join('')}</dl></section>
+    <section><h3>How it's built</h3><ol class="steps">${a.build.map(s=>`<li>${s}</li>`).join('')}</ol></section>
+    <section><h3>What should it do?</h3><div class="opts">${a.opts.map((o,i)=>`<label><input type="checkbox" id="aopt-${a.id}-${i}" ${picked[i]?'checked':''}> ${o[0]}</label>`).join('')}</div></section>
+    <section><h3>Your prompt</h3><div class="pbo"></div></section>`;
+  mountAnimDemo(a,sheet.querySelector('.demo'));
+  const addBtn=document.createElement('button');addBtn.className='save';
+  const syncAdd=()=>{const on=inCart(key);addBtn.setAttribute('aria-pressed',on);addBtn.textContent=on?'Update cart':'+ Save to cart';};
+  addBtn.onclick=()=>{const was=inCart(key);putCart({k:key,type:'anim',id,picked:picked.slice()},was?`Updated ${a.name} in cart`:`Added ${a.name} to cart`);syncAdd();};
+  syncAdd();
+  let src=null;
+  const out=outBox('aprompt-'+id,()=>a.page?pagePrompt(a,picked,src):animPrompt(a,picked),[addBtn]);
+  if(a.page)fetch(a.page).then(r=>r.ok?r.text():Promise.reject()).then(t=>{src=t;out.upd();}).catch(()=>{src='';out.upd();});
+  out.ta.classList.add('tall');
+  sheet.querySelector('.pbo').appendChild(out.el);
+  sheet.querySelectorAll('.opts input').forEach((c,i)=>c.onchange=()=>{picked[i]=c.checked;out.upd();});
+  sheet.querySelectorAll('[data-anim]').forEach(b=>b.onclick=()=>openAnim(b.dataset.anim));
+  sheet.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>openPanel(b.dataset.go));
+  showSheet(panel,from);
+}
+
 function renderCartSheet(){
-  const groups=[['ds','Design system'],['font','Fonts'],['feat','Feature recipes'],['pattern','UI patterns']];
+  const groups=[['ds','Design system'],['font','Fonts'],['feat','Feature recipes'],['pattern','UI patterns'],['anim','Animations']];
   cartSheet.innerHTML=`<div class="s-top"><div><div class="eyebrow">This session</div><h2 id="c-title"><span>Your cart</span></h2><div class="aka">${cart.length} item${cart.length===1?'':'s'} saved</div></div><button class="x" data-close aria-label="Close">×</button></div><div class="citems"></div>`;
   const box=cartSheet.querySelector('.citems');
   if(!cart.length){box.innerHTML='<p class="cempty">Nothing saved yet. Press “+ Save” on any pattern, recipe or font, or save your design system.</p>';return;}
@@ -299,6 +394,7 @@ function renderCartSheet(){
     items.forEach(it=>{const[n,s]=itemLabel(it);const r=document.createElement('div');r.className='citem';r.innerHTML=`<div><b>${esc(n)}</b><small>${esc(s)}</small></div><button aria-label="Remove ${esc(n)}">Remove</button>`;
       r.querySelector('button').onclick=()=>{dropCart(it.k);renderCartSheet();syncSaveButtons();};
       if(it.type==='pattern'){r.querySelector('b').style.cursor='pointer';r.querySelector('b').onclick=()=>openPanel(it.id);}
+      if(it.type==='anim'){r.querySelector('b').style.cursor='pointer';r.querySelector('b').onclick=()=>openAnim(it.id);}
       g.appendChild(r);});
     box.appendChild(g);
   });
@@ -311,6 +407,38 @@ function renderCartSheet(){
 }
 function refreshCart(){document.getElementById('fabN').textContent=cart.length;if(!cartWrap.hidden)renderCartSheet();syncSaveButtons();}
 document.getElementById('fab').onclick=e=>{panel.hidden=true;renderCartSheet();showSheet(cartWrap,e.currentTarget);};
+
+/* ================= animation view ================= */
+const KINDS=[['Backgrounds','Moving colour and texture behind your content.'],['Text','Headlines that arrive with style.'],['Scroll','Motion tied to scrolling.'],
+  ['3D','Depth, tilt and things that float.'],['Pages','Whole pages that combine everything.']].filter(([k])=>A.some(a=>a.kind===k));
+let akind='All';
+function animCard(a,i){
+  const c=document.createElement('article');c.className='card '+catSlug(a.kind);
+  c.innerHTML=`<div class="demo"></div><button class="meta" aria-label="${esc(a.name)}: see how it's built and get the prompt"><span class="top"><span class="k">${a.kind}</span><span class="no">№A${String(i+1).padStart(2,'0')}</span></span><span class="nm">${a.name}<span class="arr" aria-hidden="true">→</span></span><span class="aka">also called ${a.aka.join(', ')}</span><p class="say">${a.say}</p><span class="tpl">Full template · ${a.build.length} steps</span></button>`;
+  c.prepend(saveBtn('anim:'+a.id,()=>putCart({k:'anim:'+a.id,type:'anim',id:a.id,picked:defaultPicked(a)},`Added ${a.name} to cart`),'+ Save',true));
+  mountAnimDemo(a,c.querySelector('.demo'));
+  c.querySelector('.meta').onclick=e=>openAnim(a.id,e.currentTarget);
+  return c;
+}
+function renderAnim(){
+  const g=document.getElementById('agrid');g.innerHTML='';
+  const list=A.map((a,i)=>({a,i})).filter(x=>akind==='All'||x.a.kind===akind);
+  document.getElementById('acount').textContent=akind==='All'?A.length:`${list.length} of ${A.length}`;
+  KINDS.forEach(([k,desc])=>{
+    const items=list.filter(x=>x.a.kind===k);if(!items.length)return;
+    if(akind==='All'){const h=document.createElement('div');h.className='ghead '+catSlug(k);h.innerHTML=`<h3>${k}</h3><p>${desc}</p><span class="c">${items.length} templates</span>`;g.appendChild(h);}
+    items.forEach(({a,i})=>g.appendChild(animCard(a,i)));
+  });
+}
+function renderKinds(){
+  const el=document.getElementById('akinds');el.innerHTML='';
+  [['All',A.length],...KINDS.map(([k])=>[k,A.filter(a=>a.kind===k).length])].forEach(([k,n])=>{
+    const b=document.createElement('button');b.className=k==='All'?'':catSlug(k);b.setAttribute('aria-pressed',k===akind);
+    b.innerHTML=`${k==='All'?'':'<span class="dot"></span>'}${k==='All'?'All animations':k}<span class="c">${n}</span>`;
+    b.onclick=()=>{akind=k;renderKinds();renderAnim();};
+    el.appendChild(b);
+  });
+}
 
 /* ================= features view ================= */
 function renderFeats(){
@@ -433,13 +561,14 @@ function renderDs(){
 }
 
 /* ================= view switch ================= */
-const VIEWS=['patterns','features','fonts','design'];
+const VIEWS=['patterns','animation','features','fonts','design'];
 function switchView(v){
   document.querySelectorAll('.views [role=tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v));
   const was=document.getElementById('view-'+v).hidden;
   VIEWS.forEach(x=>document.getElementById('view-'+x).hidden=x!==v);
   document.getElementById('home').hidden=v!=='patterns';
   if(v==='patterns')startShow();else stopShow();
+  if(v==='animation'){renderKinds();renderAnim();}
   if(v==='features')renderFeats();if(v==='fonts')renderFonts();if(v==='design')renderDs();
   if(was&&v!=='patterns')window.scrollTo({top:0});
 }
@@ -447,4 +576,4 @@ document.querySelectorAll('.views [role=tab]').forEach(b=>b.onclick=()=>switchVi
 document.querySelector('[data-home]').onclick=e=>{e.preventDefault();switchView('patterns');window.scrollTo({top:0,behavior:reduceMotion?'auto':'smooth'});};
 
 renderGrid();refreshCart();
-const h=location.hash.slice(1);if(byId[h])openPanel(h);else if(VIEWS.includes(h))switchView(h);
+const h=location.hash.slice(1);if(byId[h])openPanel(h);else if(animById[h]){switchView('animation');openAnim(h);}else if(VIEWS.includes(h))switchView(h);

@@ -17,6 +17,7 @@
     <a class="brandmark" href="#" data-home><span>Whatsit</span></a>
     <nav class="views" role="tablist" aria-label="Sections">
       <button role="tab" data-v="patterns" aria-selected="true">UI patterns</button>
+      <button role="tab" data-v="animation" aria-selected="false">Animation</button>
       <button role="tab" data-v="features" aria-selected="false">Feature recipes</button>
       <button role="tab" data-v="fonts" aria-selected="false">Fonts</button>
       <button role="tab" data-v="design" aria-selected="false">Design system</button>
@@ -68,6 +69,14 @@
       <div class="lib-body">
         <nav class="catnav" id="cats" aria-label="Categories"></nav>
         <div id="grid" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="view-animation" hidden>
+      <div class="sec-head"><div><p class="kicker">Full templates</p><h2>Animation <span class="count" id="acount"></span></h2></div><p>Bigger than a pattern: each one comes with its layers, the exact timing and easing, step-by-step build instructions and a full prompt.</p></div>
+      <div class="lib-body">
+        <nav class="catnav" id="akinds" aria-label="Animation types"></nav>
+        <div id="agrid" class="grid"></div>
       </div>
     </section>
 
@@ -139,6 +148,7 @@
 
 <script src="data/registry.js"></script>
 <script src="data/patterns/index.js"></script>
+<script src="data/animations/index.js"></script>
 <script src="data/recipes.js"></script>
 <script src="data/fonts.js"></script>
 <script src="data/palettes.js"></script>

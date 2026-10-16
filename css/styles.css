@@ -125,6 +125,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- library: categories ---------- */
 .cat-Forms{--cat:#1F8A78}.cat-Navigation{--cat:#4A62C8}.cat-Overlays{--cat:#9A4CB0}.cat-Feedback{--cat:#C4860F}
 .cat-Layout{--cat:#6C8A2E}.cat-Data{--cat:#3C7FA8}.cat-Media{--cat:#D1553E}
+.cat-Backgrounds{--cat:#7B4DD6}.cat-Text{--cat:#D2456F}.cat-Scroll{--cat:#0E8F9A}.cat-3D{--cat:#D9822B}.cat-Pages{--cat:#5D6FA3}
 .lib-body{display:grid;grid-template-columns:210px minmax(0,1fr);gap:40px;align-items:start}
 .catnav{position:sticky;top:84px;display:flex;flex-direction:column;gap:2px}
 .catnav button{display:flex;align-items:center;gap:10px;border:0;background:none;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:15px;color:var(--muted);text-align:left}
@@ -219,6 +220,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 .out textarea{width:100%;min-height:200px;resize:vertical;font:13px/1.6 var(--mono);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .acts-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
 .note{font-size:13px;color:var(--muted);min-height:18px}
+.out textarea.tall{min-height:340px}
+.demo.framed{padding:0;display:block;background:#000}
+.demo.framed iframe{position:absolute;left:0;top:0;width:1440px;border:0;transform-origin:0 0;display:block}
+.sheet .demo.framed{height:auto;aspect-ratio:16/10}
+.sheet .acts-row .aka{align-self:center}
+/* ---------- animation templates ---------- */
+.tpl{align-self:flex-start;margin-top:10px;font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--cat);border:1px solid color-mix(in srgb,var(--cat) 40%,transparent);border-radius:999px;padding:3px 9px}
+.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.5;max-width:62ch}
+.steps li::marker{font:700 13px var(--mono);color:var(--accent)}
+.parts.motion dd{font-family:var(--mono);font-size:13.5px;color:var(--ink)}
 .opts{display:flex;flex-direction:column;gap:6px;font-size:15px}
 .opts label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
 .opts input{accent-color:var(--accent);margin-top:4px}
