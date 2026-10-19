@@ -3,3 +3,17 @@ node_modules/
 Thumbs.db
 *.log
 .vscode/
+
+# Secrets: never commit these, even by accident
+.env
+.env.*
+*.pem
+*.key
+
+# Python leftovers
+__pycache__/
+*.pyc
+.venv/
+
+# Promo video, voiceover and its tools: for showcasing only, the app doesn't need any of it
+promo/
