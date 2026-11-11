@@ -13,8 +13,8 @@ fills that gap.
 
 ## What's inside
 
-- **52 UI patterns with live demos**: carousel, modal, toast, stepper, command
-  palette, date picker, code input and more. Each one has:
+- **66 UI patterns with live demos**: carousel, modal, toast, stepper, command
+  palette, date picker, chat bubbles, bar chart, audio player and more. Each one has:
   - the names people also use for it ("Modal = Dialog, Popup, Lightbox")
   - its parts, so you can describe it precisely (backdrop, dialog, actions…)
   - when to use it and when not to
@@ -31,11 +31,12 @@ fills that gap.
   your AI can recreate them exactly.
 - **Search in plain words**: type "box pops up and the page goes dark" and it
   answers *Modal*.
-- **15 feature recipes**: Checkout, Login & sign up, Dashboard, Admin panel, Landing page…
-  Each shows which patterns it's built from.
-- **Fonts**: 15 everyday fonts and 14 display fonts, all free for commercial
+- **29 recipes**: 19 features (Checkout, Login & sign up, Dashboard, Admin panel,
+  Landing page…) and 10 whole apps (Online store, Point of sale, Messaging app,
+  Music app, Habit tracker, Documentation site…). Each shows which patterns it's built from.
+- **Fonts**: 27 everyday fonts and 26 display fonts, all free for commercial
   use (Google Fonts, SIL Open Font License), with mood filters and a font glossary.
-- **Design system builder**: 12 palettes, colors explained in plain words,
+- **Design system builder**: 22 palettes, colors explained in plain words,
   typography, corners, shadows, a live preview and a readability check.
 - **Cart**: save patterns, animations, recipes, fonts and your design system, then copy
   everything as **one combined prompt**.
