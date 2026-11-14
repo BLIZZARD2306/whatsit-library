@@ -109,14 +109,14 @@ function pagePrompt(a,picked,src){
   if(inc.length)L.push('','## Keep',...inc);
   if(exc.length)L.push('','## Leave out (remove it from the reference)',...exc);
   L.push('','## Performance',a.perf,'','## Accessibility',a.a11y,'',
-    '## Make it yours','Keep the structure, timing and interactions. Then swap the brand name, colours, copy and product for mine when I give them. The reference brand, copy and artwork are fictional placeholders.','');
+    '## Make it yours','Keep the structure, timing and interactions. Then swap the brand name, colours, copy and product for mine when I give them. The reference brand, copy and artwork are fictional placeholders.',...(a.settings?[a.settings]:[]),'');
   if(src===null)L.push('## Reference source','(Loading the full source…)');
   else if(src)L.push('## Reference source (complete, reproduce it exactly)','','```html',src.trim(),'```');
   else L.push('## Reference source',`Open ${url} and copy its full source. (It couldn't be loaded here; this happens when Whatsit is opened as a local file.)`);
   return L.join('\n');
 }
 const featSpec=f=>[`${f.name}: ${f.say}`,'Use these UI patterns:',...f.spec.map(s=>'- '+s)].join('\n');
-const featPrompt=f=>[`Build a ${f.name.toLowerCase()}.`,'',PROJECT_LINE,'',featSpec(f),'','Use realistic sample data. Keep each pattern as its own component so I can reuse it.'].join('\n');
+const featPrompt=f=>[`Build ${/^[aeiou]/i.test(f.name)?'an':'a'} ${f.name.toLowerCase()}.`,'',PROJECT_LINE,'',featSpec(f),'','Use realistic sample data. Keep each pattern as its own component so I can reuse it.'].join('\n');
 const fontLine=role=>{const n=ds[role];return `- ${role==='heading'?'Headings':'Body text'}: “${n}” from Google Fonts (${fontBy[n]?fontBy[n].cat.toLowerCase():'font'}), fallback ${fontBy[n]?FB[fontBy[n].cat]:'sans-serif'}. Load weights 400 and 700.${isDisplay(n)?' It is a display font: use it only at 40px and larger (logo, hero, h1), and use a plain font for smaller headings.':''}`;};
 function displayPrompt(f,brand){
   return [`Use the display font “${f.name}” for my brand “${brand}”.`,'',PROJECT_LINE,'',
@@ -441,11 +441,15 @@ function renderKinds(){
 }
 
 /* ================= features view ================= */
+const FKINDS=['All','Features','Whole apps'];let fkind='All';
+const featKind=f=>f.kind==='app'?'Whole apps':'Features';
 function renderFeats(){
   const list=document.getElementById('featList');list.innerHTML='';
-  FEATS.forEach(f=>{
+  const shown=FEATS.filter(f=>fkind==='All'||featKind(f)===fkind);
+  document.getElementById('fcount').textContent=shown.length;
+  shown.forEach(f=>{
     const c=document.createElement('article');c.className='feat';
-    c.innerHTML=`<div class="row"><h3>${f.name}</h3></div><p>${f.say}</p><div class="eq">${f.uses.map(u=>`<button data-go="${u}">${byId[u].name}</button>`).join('<span>+</span>')}</div>`;
+    c.innerHTML=`<div class="row"><h3>${f.name}</h3></div><p>${f.kind==='app'?'<span class="fkind">Whole app</span> ':''}${f.say}</p><div class="eq">${f.uses.map(u=>`<button data-go="${u}">${byId[u].name}</button>`).join('<span>+</span>')}</div>`;
     c.querySelector('.row').appendChild(saveBtn('feat:'+f.id,()=>putCart({k:'feat:'+f.id,type:'feat',id:f.id},`Added ${f.name} to cart`)));
     c.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>openPanel(b.dataset.go,b));
     c.appendChild(outBox('feat-'+f.id,()=>featPrompt(f)).el);
@@ -483,7 +487,7 @@ function renderDisplay(){
   DISPLAY.filter(f=>dmood==='All'||f.moods.includes(dmood)).forEach(f=>{
     const c=document.createElement('article');c.className='dcard';
     c.innerHTML=`<div class="reel" style="--len:${Math.max(brand.length,4)};--wf:${f.wf}"><div class="w" style="font-family:${fstack(f.name)};font-weight:${f.weight||400}">${esc(brand)}</div><div class="moods">${f.moods.map(m=>`<span>${m}</span>`).join('')}</div></div>
-      <div class="dmeta"><div class="row"><b>${f.name}</b><span class="src">Free · Google</span></div><p>${f.style}. Similar to the paid “${f.like}” font. Pairs with ${f.body}.</p><div class="acts-row"></div></div>`;
+      <div class="dmeta"><div class="row"><b>${f.name}</b><span class="src">Free · Google</span></div><p>${f.style}. ${f.like?`Similar to the paid “${f.like}” font. `:''}Pairs with ${f.body}.</p><div class="acts-row"></div></div>`;
     const row=c.querySelector('.acts-row');
     const on=ds.heading===f.name&&inCart('font:heading');
     const use=document.createElement('button');use.className='save';use.setAttribute('aria-pressed',on);use.textContent=on?'✓ Your heading font':'Use for headings';
@@ -500,6 +504,7 @@ function renderDisplay(){
 document.getElementById('dtext').addEventListener('input',()=>renderDisplay());
 document.getElementById('ftext').addEventListener('input',()=>renderFonts());
 document.getElementById('fsize').addEventListener('input',e=>document.getElementById('fontList').style.setProperty('--fsz',e.target.value+'px'));
+pills(document.getElementById('fkinds'),FKINDS,fkind,k=>{fkind=k;renderFeats();});
 pills(document.getElementById('fcats'),['All',...new Set(FONTS.map(f=>f.cat))],fcat,c=>{fcat=c;renderFonts();});
 
 /* ================= design system view ================= */

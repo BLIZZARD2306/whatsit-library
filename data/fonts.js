@@ -15,8 +15,21 @@ Whatsit.fonts = [
   {name:'Syne',cat:'Display',mood:'Artsy, wide, experimental',use:'Portfolios and creative agencies',pairs:['Manrope','DM Sans']},
   {name:'JetBrains Mono',cat:'Monospace',mood:'Techy, precise',use:'Code, numbers, developer tools',pairs:['Manrope','Plus Jakarta Sans']},
   {name:'Caveat',cat:'Handwritten',mood:'Casual, personal',use:'Small accents and notes, never body text',pairs:['Nunito','DM Sans']},
+  {name:'Inter',cat:'Sans-serif',mood:'Neutral, clear, gets out of the way',use:'App interfaces, tables, anything dense',pairs:['Instrument Serif','Source Serif 4']},
+  {name:'Figtree',cat:'Sans-serif',mood:'Friendly, clean, slightly round',use:'Marketing sites and consumer apps',pairs:['Fraunces','Instrument Serif']},
+  {name:'Space Grotesk',cat:'Sans-serif',mood:'Quirky, techy, a little retro',use:'Crypto, AI tools, portfolios',pairs:['Space Mono','Inter']},
+  {name:'Sora',cat:'Sans-serif',mood:'Wide, futuristic, smooth',use:'Tech brands and product headlines',pairs:['Inter','DM Sans']},
+  {name:'Lexend',cat:'Sans-serif',mood:'Open, calm, built for easy reading',use:'Education, reading apps, large body text',pairs:['Lora','Source Serif 4']},
+  {name:'Source Serif 4',cat:'Serif',mood:'Steady, readable, trustworthy',use:'News, documentation, long reading',pairs:['Inter','Lexend']},
+  {name:'Instrument Serif',cat:'Serif',mood:'Tall, refined, editorial',use:'Big headlines on landing pages',pairs:['Inter','Figtree']},
+  {name:'Libre Baskerville',cat:'Serif',mood:'Traditional, literary',use:'Books, law, finance, formal writing',pairs:['Inter','DM Sans']},
+  {name:'Unbounded',cat:'Display',mood:'Extra wide, bold, loud',use:'Short hero headlines and logos',pairs:['Inter','Manrope']},
+  {name:'Space Mono',cat:'Monospace',mood:'Retro computer, quirky',use:'Labels, numbers, techy accents',pairs:['Space Grotesk','Inter']},
+  {name:'IBM Plex Mono',cat:'Monospace',mood:'Engineered, serious',use:'Code, data and dashboards',pairs:['Inter','Manrope']},
+  {name:'Kalam',cat:'Handwritten',mood:'Marker pen, warm, informal',use:'Sticky notes, annotations, small accents',pairs:['Nunito','Figtree']},
 ];
 
+// like = an optional paid font it resembles (named for reference only)
 // wf = rough width factor so wide faces shrink and condensed faces grow inside the reel card
 Whatsit.displayFonts = [
   {name:'Cinzel Decorative',like:'Cirlce',moods:['Fantasy','Mythical','Regal'],style:'Flared capitals that look carved in stone',body:'Lora',wf:.95},
@@ -33,6 +46,18 @@ Whatsit.displayFonts = [
   {name:'Anton',like:'Nexus',moods:['Bold','Poster','Sporty'],style:'Tall, condensed and heavy',body:'DM Sans',wf:.55},
   {name:'Bebas Neue',like:'Nexus',moods:['Poster','Cinematic','Bold'],style:'Condensed all-caps headline face',body:'DM Sans',wf:.5},
   {name:'Big Shoulders Display',like:'Nexus',moods:['Industrial','Poster','Urban'],style:'Narrow, heavy, city-signage letters',body:'Plus Jakarta Sans',wf:.5,weight:800},
+  {name:'Abril Fatface',moods:['Editorial','Bold','Elegant'],style:'Fat, curvy headline serif from old magazine covers',body:'DM Sans',wf:.85},
+  {name:'Yeseva One',moods:['Elegant','Romantic','Vintage'],style:'Soft, rounded serif with a feminine feel',body:'Lora',wf:.9},
+  {name:'Orbitron',moods:['Futuristic','Sci-fi','Techy'],style:'Squared, geometric letters from a spaceship dashboard',body:'Manrope',wf:1.15,weight:700},
+  {name:'Audiowide',moods:['Futuristic','Techy','Sporty'],style:'Wide, rounded letters with a racing feel',body:'Manrope',wf:1.2},
+  {name:'Press Start 2P',moods:['Pixel','Gaming','Retro'],style:'Blocky 8-bit letters from an arcade screen',body:'Space Mono',wf:1.85},
+  {name:'Monoton',moods:['Retro','Neon','Groovy'],style:'Letters drawn with parallel lines, like a neon sign',body:'DM Sans',wf:1.25},
+  {name:'Pacifico',moods:['Retro','Playful','Handmade'],style:'Smooth brush script from a 1950s surf poster',body:'Nunito',wf:.85},
+  {name:'Fredoka',moods:['Playful','Kids','Bold'],style:'Big, round, bubbly letters',body:'Nunito',wf:.9,weight:600},
+  {name:'Rye',moods:['Western','Vintage','Poster'],style:'Ornate slab letters from a saloon sign',body:'Lora',wf:1.15},
+  {name:'Special Elite',moods:['Vintage','Typewriter','Mystery'],style:'Worn typewriter letters with ink blots',body:'Lora',wf:1},
+  {name:'Permanent Marker',moods:['Handmade','Urban','Bold'],style:'Thick felt-tip marker lettering',body:'DM Sans',wf:1},
+  {name:'UnifrakturCook',moods:['Gothic','Fantasy','Mythical'],style:'Heavy blackletter from old manuscripts',body:'Lora',wf:.8,weight:700},
 ];
 
 Whatsit.fontGlossary = [['Serif','Letters have small “feet”. Feels classic and bookish.'],['Sans-serif','No feet. Clean and modern; the usual choice for apps.'],['Display','Made for big sizes only, like headlines and logos.'],['Monospace','Every letter is the same width. Used for code and numbers.'],['Handwritten','Looks written by hand. Use for small accents only.'],['Weight','How thick the letters are: 400 is regular, 700 is bold.'],['Pairing','One font for headings, another for body text.']];
